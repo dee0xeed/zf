@@ -396,6 +396,8 @@ pub const VirtualStackMachine = struct {
         try drain();
         self.need_prompt = true;
         self.dstk.top = 0;
+        self.rstk.top = 0;
+        self.cstk.top = 0;
         self.cend = 8;
         self.cptr = 0;
         self.mode = .interpreting;
