@@ -336,7 +336,9 @@ pub const VirtualStackMachine = struct {
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
             .{.name = "+",     .func = &rt.addImpl},
+            .{.name = "1+",    .func = &rt.incImpl},
             .{.name = "-",     .func = &rt.subImpl},
+            .{.name = "1-",    .func = &rt.decImpl},
             .{.name = "*",     .func = &rt.mulImpl},
             .{.name = "/",     .func = &rt.divImpl},
             .{.name = "mod",   .func = &rt.modImpl},
@@ -355,6 +357,7 @@ pub const VirtualStackMachine = struct {
             .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "var", .func = &},
 //            .{.name = "val", .func = &},
+//            .{.name = "create", .func = &},
 
             // compiling words
             .{.name = ";",    .func = &ct.leaveCompileMode, .comp = true},
@@ -366,6 +369,9 @@ pub const VirtualStackMachine = struct {
 //            .{.name = "break", .func = &ct.breakImpl, .comp = true},
 //            .{.name = "leave", .func = &ct.breakImpl, .comp = true},
             .{.name = "loop", .func = &ct.compLoop, .comp = true},
+            .{.name = "begin", .func = &ct.compBegin, .comp = true},
+            .{.name = "again", .func = &ct.compAgain, .comp = true},
+            .{.name = "until", .func = &ct.compUntil, .comp = true},
             .{.name = "(",  .func = &ct.commentImpl, .comp = true},
         };
 
