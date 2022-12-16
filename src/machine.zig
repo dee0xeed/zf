@@ -352,7 +352,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "min",   .func = &rt.minImpl},
 
             // defining words
-//            .{.name = ":",     .func = &enterCompileMode},
+            .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "var", .func = &},
 //            .{.name = "val", .func = &},
 
