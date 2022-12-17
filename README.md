@@ -14,6 +14,18 @@ if else then do iter i loop next begin again until (
 
 ## shell
 
+```zig
+        vm.code[0] = vm.dict.getWordNumber("prom").?;
+        vm.code[1] = vm.dict.getWordNumber("read").?;
+        vm.code[2] = vm.dict.getWordNumber("jifz").?;
+        vm.code[3] = 7;
+        vm.code[4] = vm.dict.getWordNumber("exec").?;
+        vm.code[5] = vm.dict.getWordNumber("jump").?;
+        vm.code[6] = 0;
+        vm.code[7] = vm.dict.getWordNumber("bye").?;
+
+```
+
 ```
 zf> .code
 code[0] = 0xffffffffffffff01 // print 'zf>' (zf(c)> when 'compiling')
