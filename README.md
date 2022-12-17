@@ -40,6 +40,9 @@ code[7] = 0xffffffffffffff0b // bye                     <--|
 ## try it
 
 ```
+zf> : raise-to-the-power-of-two
+zf(c)> dup * .
+zf(c)> ;
 zf> : τετραγωνίζω
 zf(c)> dup * .
 zf(c)> ;
@@ -47,6 +50,8 @@ zf> : в-квадрате
 zf(c)> dup * .
 zf(c)> ;
 zf>
+zf> 5 raise-to-the-power-of-two cr
+25
 zf> 8 τετραγωνίζω cr
 64 
 zf> 9 в-квадрате cr
