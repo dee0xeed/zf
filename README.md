@@ -39,6 +39,8 @@ code[7] = 0xffffffffffffff0b // bye                     <--|
 
 ## try it
 
+### sqr
+
 ```
 zf> : raise-to-the-power-of-two
 zf(c)> dup * .
@@ -56,6 +58,18 @@ zf> 8 τετραγωνίζω cr
 64 
 zf> 9 в-квадрате cr
 81
+```
+
+### loop
+
+```
+zf> : foreach 
+zf(c)> iter i . next 
+zf(c)> ;
+zf> 
+zf> 5 1 foreach cr
+1 2 3 4 
+zf>
 ```
 
 ## Links
