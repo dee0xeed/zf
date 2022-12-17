@@ -37,6 +37,22 @@ code[6] = 0x0000000000000000 // beginning                  |              -->|
 code[7] = 0xffffffffffffff0b // bye                     <--|
 ```
 
+## try it
+
+```
+zf> : τετραγωνίζω
+zf(c)> dup * .
+zf(c)> ;
+zf> : в-квадрате
+zf(c)> dup * .
+zf(c)> ;
+zf>
+zf> 8 τετραγωνίζω cr
+64 
+zf> 9 в-квадрате cr
+81
+```
+
 ## Links
 
 * [Starting FORTH](https://www.forth.com/starting-forth/)
