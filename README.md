@@ -27,14 +27,14 @@ vm.code[7] = vm.dict.getWordNumber("bye").?;
 
 ```
 zf> .code
-code[0] = 0xffffffffffffff01 // print 'zf>' (zf(c)> when 'compiling')
-code[1] = 0xffffffffffffff02 // read a word
-code[2] = 0xffffffffffffff05 // if TOS == 0, jump to
-code[3] = 0x0000000000000007 // this instruction
-code[4] = 0xffffffffffffff03 // execute the word
-code[5] = 0xffffffffffffff04 // unconditional jump to the
-code[6] = 0x0000000000000000 // beginning
-code[7] = 0xffffffffffffff0b // bye
+code[0] = 0xffffffffffffff01 // print 'zf> ' ('zf(c)> ' when "compiling") <--|
+code[1] = 0xffffffffffffff02 // read a word                                  |
+code[2] = 0xffffffffffffff05 // if TOS == 0, jump to    -->|                 |
+code[3] = 0x0000000000000007 // this location              |                 |
+code[4] = 0xffffffffffffff03 // execute the word           |                 |
+code[5] = 0xffffffffffffff04 // unconditional jump to the  |                 |
+code[6] = 0x0000000000000000 // beginning                  |              -->|
+code[7] = 0xffffffffffffff0b // bye                     <--|
 ```
 
 ## Links
