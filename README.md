@@ -72,11 +72,12 @@ zf> 5 1 foreach cr
 zf>
 ```
 
-NOTE: `iter` and `next` are just synonyms for standart words `do` and `loop`, respectively.
+NOTE: `iter` and `next` are just synonyms for standard words `do` and `loop`, respectively.
 
 ## Links
 
 * [Starting FORTH](https://www.forth.com/starting-forth/)
-* [Forth standart](https://forth-standard.org/standard/core)
+* [Forth standard](https://forth-standard.org/standard/core)
 * [Open FirmWare/Forth Lessons](https://wiki.laptop.org/go/Forth_Lessons)
 * [Implementing a FORTH virtual machine](http://www.w3group.de/forth_course.html)
+* [MuP21 instruction set](https://groups.google.com/g/comp.lang.forth/c/7UULcFs7kas)
