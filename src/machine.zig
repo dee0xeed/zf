@@ -189,10 +189,9 @@ pub const VirtualStackMachine = struct {
         if (wnum) |wn| {
             const word = &self.dict.words[wn & ~Dict.mask];
             if (true == word.comp) {
-                // "immediate"
                 try word.func(self);
             } else {
-                try compileWord(self, wn);
+                try self.compileWord(wn);
             }
             return;
         }
@@ -205,14 +204,15 @@ pub const VirtualStackMachine = struct {
 
         // compile number literal
         const wn = self.dict.getWordNumber("lit").?;
-        try compileWord(self, wn);
-        try compileWord(self, @bitCast(usize, number));
+        try self.compileWord(wn);
+        try self.compileWord(@bitCast(usize, number));
     }
 
     fn execWord(self: *VirtualStackMachine) !void {
 
         if (.compiling == self.mode) {
-            try compile(self);
+            //try compile(self);
+            try self.compile();
             return;
         }
 
@@ -274,7 +274,7 @@ pub const VirtualStackMachine = struct {
     }
 
     fn enterCompileMode(self: *VirtualStackMachine) !void {
-        try readWord(self);
+        try self.readWord();
         _ = try self.dstk.pop(); // check for zero
         const name = self.ibuf[0..self.bcnt];
 
@@ -423,7 +423,8 @@ pub const VirtualStackMachine = struct {
             self.current_word.func(self) catch |err| {
                 //switch (err) {}
                 std.debug.print("{}\n", .{err});
-                try reset(self);
+                //try reset(self);
+                try self.reset();
             };
         }
     }
