@@ -72,6 +72,8 @@ zf> 5 1 foreach cr
 zf>
 ```
 
+NOTE: `iter` and `next` are just synonyms for standard words `do` and `loop`, respectively.
+
 ### variables
 
 ```
@@ -95,8 +97,6 @@ data[1] = 0x0000000000000008
 zf> var1 @ var2 @ * . cr
 56 
 ```
-
-NOTE: `iter` and `next` are just synonyms for standard words `do` and `loop`, respectively.
 
 ## Links
 

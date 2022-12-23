@@ -380,8 +380,8 @@ pub const VirtualStackMachine = struct {
             .{.name = "allot", .func = &rt.allotImpl},
 
             // defining words
-            .{.name = ":",     .func = &enterCompileMode},
             .{.name = "create", .func = &makeAddrWord},
+            .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "val", .func = &},
 //            .{.name = "create", .func = &},
 
