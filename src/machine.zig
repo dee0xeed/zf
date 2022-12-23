@@ -426,6 +426,7 @@ pub const VirtualStackMachine = struct {
         self.dstk.top = 0;
         self.rstk.top = 0;
         self.cend = 8;
+        self.dend = 0;
         self.cptr = 0;
         self.mode = .interpreting;
         self.dict.nwords = self.nwords;
