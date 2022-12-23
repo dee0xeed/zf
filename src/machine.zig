@@ -83,7 +83,6 @@ pub const VirtualStackMachine = struct {
     nwords: usize = 0,
     dstk: Stack,                    // data stack
     rstk: Stack,                    // return stack
-    cstk: Stack,                    // control stack
     code: [cap]usize = undefined,
     cptr: usize = 0,                // "instruction pointer"/"program counter"
     cend: usize = 0,                // first free code cell
@@ -211,7 +210,6 @@ pub const VirtualStackMachine = struct {
     fn execWord(self: *VirtualStackMachine) !void {
 
         if (.compiling == self.mode) {
-            //try compile(self);
             try self.compile();
             return;
         }
@@ -263,10 +261,6 @@ pub const VirtualStackMachine = struct {
         self.rstk.dump();
     }
 
-    fn dumpControlStack(self: *VirtualStackMachine) !void {
-        self.cstk.dump();
-    }
-
     fn dumpCode(self: *VirtualStackMachine) !void {
         var k: usize = 0;
         while (k < self.cend) : (k += 1)
@@ -306,7 +300,6 @@ pub const VirtualStackMachine = struct {
             .dict = Dict{},
             .dstk = Stack{.name = "dstk"},
             .rstk = Stack{.name = "rstk"},
-            .cstk = Stack{.name = "cstk"},
         };
 
         const builtins: []const Word = &[_]Word {
@@ -331,7 +324,6 @@ pub const VirtualStackMachine = struct {
             .{.name = ".dict", .func = &dumpDict},
             .{.name = ".dstk", .func = &dumpDataStack},
             .{.name = ".rstk", .func = &dumpReturnStack},
-            .{.name = ".cstk", .func = &dumpControlStack},
             .{.name = ".code", .func = &dumpCode},
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
@@ -399,7 +391,6 @@ pub const VirtualStackMachine = struct {
         self.need_prompt = true;
         self.dstk.top = 0;
         self.rstk.top = 0;
-        self.cstk.top = 0;
         self.cend = 8;
         self.cptr = 0;
         self.mode = .interpreting;
@@ -423,7 +414,6 @@ pub const VirtualStackMachine = struct {
             self.current_word.func(self) catch |err| {
                 //switch (err) {}
                 std.debug.print("{}\n", .{err});
-                //try reset(self);
                 try self.reset();
             };
         }

@@ -30,21 +30,21 @@ pub fn returnImpl(self: *VirtualStackMachine) !void {
 pub fn doImpl(self: *VirtualStackMachine) !void {
     const index = try self.dstk.pop();
     const limit = try self.dstk.pop();
-    try self.cstk.push(limit);
-    try self.cstk.push(index);
+    try self.rstk.push(limit);
+    try self.rstk.push(index);
 }
 
 pub fn indexImpl(self: *VirtualStackMachine) !void {
-    const index = self.cstk.mem[self.cstk.top];
+    const index = self.rstk.mem[self.rstk.top];
     try self.dstk.push(index);
 }
 
 pub fn loopImpl(self: *VirtualStackMachine) !void {
-    self.cstk.mem[self.cstk.top] += 1;
-    if (self.cstk.mem[self.cstk.top] == self.cstk.mem[self.cstk.top - 1]) {
+    self.rstk.mem[self.rstk.top] += 1;
+    if (self.rstk.mem[self.rstk.top] == self.rstk.mem[self.rstk.top - 1]) {
         // end loop
-        _ = try self.cstk.pop();
-        _ = try self.cstk.pop();
+        _ = try self.rstk.pop();
+        _ = try self.rstk.pop();
         self.cptr += 1;
     } else {
         // go to the beginning of the loop
