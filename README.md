@@ -72,6 +72,30 @@ zf> 5 1 foreach cr
 zf>
 ```
 
+### variables
+
+```
+zf> 3 allot
+zf> .data
+data[0] = 0x0000000000000000
+data[1] = 0x0000000000000000
+data[2] = 0x0000000000000000
+zf> -3 allot
+zf> .data
+zf> create var1 1 allot
+zf> create var2 1 allot
+zf> .data
+data[0] = 0x0000000000000000
+data[1] = 0x0000000000000000
+zf> 7 var1 !
+zf> 8 var2 !
+zf> .data
+data[0] = 0x0000000000000007
+data[1] = 0x0000000000000008
+zf> var1 @ var2 @ * . cr
+56 
+```
+
 NOTE: `iter` and `next` are just synonyms for standard words `do` and `loop`, respectively.
 
 ## Links

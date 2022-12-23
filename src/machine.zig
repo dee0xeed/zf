@@ -13,6 +13,7 @@ pub const Word = struct {
     cpos: ?usize = null,  // location in the code, null for builtins
     hidd: bool = false,   // is hidden (not intended to use directly)
     comp: bool = false,   // compile time only, "compiling word"
+    dpos: ?usize = null,  // for variables, location in the data segment
 };
 
 pub const Dict = struct {
@@ -62,7 +63,8 @@ pub const Dict = struct {
 
 pub const VirtualStackMachine = struct {
 
-    const cap = 2048;
+    const CODE_CAP = 2048;
+    const DATA_CAP = 2048;
 
     const Error = error {
         WordNumberOutOfRange,
@@ -71,6 +73,7 @@ pub const VirtualStackMachine = struct {
         UndefinedWord,
         WordIsCompileOnly,
         IllegalWordName,
+        DataSpaceFull,
     };
 
     const Mode = enum {
@@ -83,9 +86,11 @@ pub const VirtualStackMachine = struct {
     nwords: usize = 0,
     dstk: Stack,                    // data stack
     rstk: Stack,                    // return stack
-    code: [cap]usize = undefined,
+    code: [CODE_CAP]usize = undefined,
     cptr: usize = 0,                // "instruction pointer"/"program counter"
     cend: usize = 0,                // first free code cell
+    data: [DATA_CAP]usize = undefined,
+    dend: usize = 0,                // first free data cell (`HERE`)
     ibuf: [256]u8 = undefined,      // input buffer
     bcnt: usize = 0,
     need_prompt: bool = true,
@@ -163,18 +168,17 @@ pub const VirtualStackMachine = struct {
 
     // add a word to the code
     pub fn compileWord(self: *VirtualStackMachine, wn: usize) !void {
-        if (cap == self.cend)
+        if (CODE_CAP == self.cend)
             return Error.CodeSpaceIsFull;
         self.code[self.cend] = wn;
         self.cend += 1;
     }
 
-    fn compile(self: *VirtualStackMachine) !void {
+    fn compile(self: *VirtualStackMachine, name: []const u8) !void {
 
         // string? TODO...
         // if ('"' == ) {}
-
-        const name = self.ibuf[0..self.bcnt];
+        // const name = self.ibuf[0..self.bcnt];
 
         if (std.mem.eql(u8, name, ":")) {
             std.debug.print("'{s}' inside word definition\n", .{name});
@@ -204,11 +208,11 @@ pub const VirtualStackMachine = struct {
         try self.compileWord(@bitCast(usize, number));
     }
 
-    fn execute(self: *VirtualStackMachine) !void {
+    fn execute(self: *VirtualStackMachine, name: []const u8) !void {
 
         // string? TODO...
+        //const name = self.ibuf[0..self.bcnt];
 
-        const name = self.ibuf[0..self.bcnt];
         var word = self.dict.findWord(name);
         if (word) |w| {
             if (true == w.comp) {
@@ -234,10 +238,13 @@ pub const VirtualStackMachine = struct {
 
         if (0 == self.bcnt)
             return;
+
+        const name = self.ibuf[0..self.bcnt];
+
         if (.compiling == self.mode) {
-            try self.compile();
+            try self.compile(name);
         } else {
-            try self.execute();
+            try self.execute(name);
         }
     }
 
@@ -268,6 +275,12 @@ pub const VirtualStackMachine = struct {
             std.debug.print("code[{}] = 0x{x:0>16}\n", .{k, self.code[k]});
     }
 
+    fn dumpData(self: *VirtualStackMachine) !void {
+        var k: usize = 0;
+        while (k < self.dend) : (k += 1)
+            std.debug.print("data[{}] = 0x{x:0>16}\n", .{k, self.data[k]});
+    }
+
     fn enterCompileMode(self: *VirtualStackMachine) !void {
         try self.readWord();
         _ = try self.dstk.pop(); // check for zero
@@ -293,6 +306,21 @@ pub const VirtualStackMachine = struct {
         };
         _ = try self.dict.addWord(word);
         self.mode = .compiling;
+    }
+
+    fn makeAddrWord(self: *VirtualStackMachine) !void {
+        try self.readWord();
+        _ = try self.dstk.pop(); // check for zero
+        const name = self.ibuf[0..self.bcnt];
+        const word = Word {
+            .name = name,
+            .func = rt.addrImpl,
+            .cpos = self.cend,
+            .hidd = false,
+            .comp = false,
+            .dpos = self.dend,
+        };
+        _ = try self.dict.addWord(word);
     }
 
     pub fn init() !VirtualStackMachine {
@@ -326,6 +354,7 @@ pub const VirtualStackMachine = struct {
             .{.name = ".dstk", .func = &dumpDataStack},
             .{.name = ".rstk", .func = &dumpReturnStack},
             .{.name = ".code", .func = &dumpCode},
+            .{.name = ".data", .func = &dumpData},
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
             .{.name = "+",     .func = &rt.addImpl},
@@ -345,10 +374,14 @@ pub const VirtualStackMachine = struct {
             .{.name = "0<",    .func = &rt.ltzImpl},
             .{.name = "max",   .func = &rt.maxImpl},
             .{.name = "min",   .func = &rt.minImpl},
+            .{.name = "!",     .func = &rt.storeImpl},
+            .{.name = "@",     .func = &rt.loadImpl},
+
+            .{.name = "allot", .func = &rt.allotImpl},
 
             // defining words
             .{.name = ":",     .func = &enterCompileMode},
-//            .{.name = "var", .func = &},
+            .{.name = "create", .func = &makeAddrWord},
 //            .{.name = "val", .func = &},
 //            .{.name = "create", .func = &},
 

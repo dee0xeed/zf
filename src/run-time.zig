@@ -2,70 +2,70 @@
 const std = @import("std");
 const VirtualStackMachine = @import("machine.zig").VirtualStackMachine;
 
-pub fn jumpImpl(self: *VirtualStackMachine) !void {
-    self.cptr = self.code[self.cptr];
+pub fn jumpImpl(vm: *VirtualStackMachine) !void {
+    vm.cptr = vm.code[vm.cptr];
 }
 
-pub fn jifzImpl(self: *VirtualStackMachine) !void {
-    const tods = try self.dstk.pop();
+pub fn jifzImpl(vm: *VirtualStackMachine) !void {
+    const tods = try vm.dstk.pop();
     if (0 == tods) {
-        self.cptr = self.code[self.cptr];
+        vm.cptr = vm.code[vm.cptr];
     } else {
-        self.cptr += 1;
+        vm.cptr += 1;
     }
 }
 
-pub fn callImpl(self: *VirtualStackMachine) !void {
-    try self.rstk.push(self.cptr);
-    self.cptr = self.current_word.cpos.?;
+pub fn callImpl(vm: *VirtualStackMachine) !void {
+    try vm.rstk.push(vm.cptr);
+    vm.cptr = vm.current_word.cpos.?;
 }
 
-pub fn returnImpl(self: *VirtualStackMachine) !void {
-    self.cptr = try self.rstk.pop();
+pub fn returnImpl(vm: *VirtualStackMachine) !void {
+    vm.cptr = try vm.rstk.pop();
 }
 
 // DO I LOOP
 // https://stackoverflow.com/questions/6949434/how-to-implement-loop-in-a-forth-like-language-interpreter-written-in-c
 
-pub fn doImpl(self: *VirtualStackMachine) !void {
-    const index = try self.dstk.pop();
-    const limit = try self.dstk.pop();
-    try self.rstk.push(limit);
-    try self.rstk.push(index);
+pub fn doImpl(vm: *VirtualStackMachine) !void {
+    const index = try vm.dstk.pop();
+    const limit = try vm.dstk.pop();
+    try vm.rstk.push(limit);
+    try vm.rstk.push(index);
 }
 
-pub fn indexImpl(self: *VirtualStackMachine) !void {
-    const index = self.rstk.mem[self.rstk.top];
-    try self.dstk.push(index);
+pub fn indexImpl(vm: *VirtualStackMachine) !void {
+    const index = vm.rstk.mem[vm.rstk.top];
+    try vm.dstk.push(index);
 }
 
-pub fn loopImpl(self: *VirtualStackMachine) !void {
-    self.rstk.mem[self.rstk.top] += 1;
-    if (self.rstk.mem[self.rstk.top] == self.rstk.mem[self.rstk.top - 1]) {
+pub fn loopImpl(vm: *VirtualStackMachine) !void {
+    vm.rstk.mem[vm.rstk.top] += 1;
+    if (vm.rstk.mem[vm.rstk.top] == vm.rstk.mem[vm.rstk.top - 1]) {
         // end loop
-        _ = try self.rstk.pop();
-        _ = try self.rstk.pop();
-        self.cptr += 1;
+        _ = try vm.rstk.pop();
+        _ = try vm.rstk.pop();
+        vm.cptr += 1;
     } else {
         // go to the beginning of the loop
-        self.cptr = self.code[self.cptr];
+        vm.cptr = vm.code[vm.cptr];
     }
 }
 
-pub fn litImpl(self: *VirtualStackMachine) !void {
-    const code = self.code[self.cptr];
-    try self.dstk.push(code);
-    self.cptr += 1; // step over the literal
+pub fn litImpl(vm: *VirtualStackMachine) !void {
+    const code = vm.code[vm.cptr];
+    try vm.dstk.push(code);
+    vm.cptr += 1; // step over the literal
 }
 
-pub fn dupImpl(self: *VirtualStackMachine) !void {
-    const x = try self.dstk.pop();
-    try self.dstk.push(x);
-    try self.dstk.push(x);
+pub fn dupImpl(vm: *VirtualStackMachine) !void {
+    const x = try vm.dstk.pop();
+    try vm.dstk.push(x);
+    try vm.dstk.push(x);
 }
 
-pub fn dropImpl(self: *VirtualStackMachine) !void {
-    _ = try self.dstk.pop();
+pub fn dropImpl(vm: *VirtualStackMachine) !void {
+    _ = try vm.dstk.pop();
 }
 
 pub fn addImpl(vm: *VirtualStackMachine) !void {
@@ -179,4 +179,27 @@ pub fn minImpl(vm: *VirtualStackMachine) !void {
     const lhs = @bitCast(isize, try vm.dstk.pop());
     const res = if (lhs < rhs) lhs else rhs;
     try vm.dstk.push(@bitCast(usize, res));
+}
+
+pub fn addrImpl(vm: *VirtualStackMachine) !void {
+    const addr = vm.current_word.dpos.?;
+    try vm.dstk.push(addr);
+}
+
+pub fn loadImpl(vm: *VirtualStackMachine) !void {
+    const addr = try vm.dstk.pop();
+    const numb = vm.data[addr];
+    try vm.dstk.push(numb);
+}
+
+pub fn storeImpl(vm: *VirtualStackMachine) !void {
+    const addr = try vm.dstk.pop();
+    const numb = try vm.dstk.pop();
+    vm.data[addr] = numb;
+}
+
+pub fn allotImpl(vm: *VirtualStackMachine) !void {
+    const d = @bitCast(isize, try vm.dstk.pop());
+    const n = @bitCast(isize, vm.dend) + d;
+    vm.dend = @bitCast(usize, n); // check...
 }
