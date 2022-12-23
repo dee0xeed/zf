@@ -174,9 +174,6 @@ pub const VirtualStackMachine = struct {
         // string? TODO...
         // if ('"' == ) {}
 
-        if (0 == self.bcnt)
-            return;
-
         const name = self.ibuf[0..self.bcnt];
 
         if (std.mem.eql(u8, name, ":")) {
@@ -207,17 +204,9 @@ pub const VirtualStackMachine = struct {
         try self.compileWord(@bitCast(usize, number));
     }
 
-    fn execWord(self: *VirtualStackMachine) !void {
-
-        if (.compiling == self.mode) {
-            try self.compile();
-            return;
-        }
+    fn execute(self: *VirtualStackMachine) !void {
 
         // string? TODO...
-
-        if (0 == self.bcnt)
-            return;
 
         const name = self.ibuf[0..self.bcnt];
         var word = self.dict.findWord(name);
@@ -238,6 +227,18 @@ pub const VirtualStackMachine = struct {
         };
 
         try self.dstk.push(@bitCast(usize, number));
+
+    }
+
+    fn procWord(self: *VirtualStackMachine) !void {
+
+        if (0 == self.bcnt)
+            return;
+        if (.compiling == self.mode) {
+            try self.compile();
+        } else {
+            try self.execute();
+        }
     }
 
     fn sayGoodbye(self: *VirtualStackMachine) !void {
@@ -307,7 +308,7 @@ pub const VirtualStackMachine = struct {
             // hidden
             .{.name = "prom", .func = &promImpl, .hidd = true},
             .{.name = "read", .func = &readWord, .hidd = true},
-            .{.name = "exec", .func = &execWord, .hidd = true},
+            .{.name = "proc", .func = &procWord, .hidd = true},
 
             .{.name = "jump",   .func = &rt.jumpImpl, .hidd = true},
             .{.name = "jifz",   .func = &rt.jifzImpl, .hidd = true},
@@ -378,7 +379,7 @@ pub const VirtualStackMachine = struct {
         vm.code[1] = vm.dict.getWordNumber("read").?;
         vm.code[2] = vm.dict.getWordNumber("jifz").?;
         vm.code[3] = 7;
-        vm.code[4] = vm.dict.getWordNumber("exec").?;
+        vm.code[4] = vm.dict.getWordNumber("proc").?;
         vm.code[5] = vm.dict.getWordNumber("jump").?;
         vm.code[6] = 0;
         vm.code[7] = vm.dict.getWordNumber("bye").?;
