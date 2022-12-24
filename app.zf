@@ -1,3 +1,3 @@
 var x
 7 x !
-cr x @ . cr
+cr x ?

@@ -129,12 +129,12 @@ Bye, see you later!
 ```
 $ cat lib.zf 
 : var create 1 allot ;
+: ? @ . cr ;
 
 $ cat app.zf 
 var x
 7 x !
-cr x @ . cr
-
+cr x ?
 ```
 
 ## Links
