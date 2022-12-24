@@ -95,6 +95,26 @@ zf> var1 @ var2 @ * . cr
 56 
 ```
 
+```
+zf> : var create 1 allot ;
+zf> : km 1000 * ;
+zf> : hour 3600 * ;
+zf> var distance
+zf> var time
+zf> var speed
+zf> 100 km distance !
+zf> 1 hour time !
+zf> distance @ time @ / speed !
+zf> .data
+data[0] = 0x00000000000186a0 ('distance')
+data[1] = 0x0000000000000e10 ('time')
+data[2] = 0x000000000000001b ('speed')
+zf> : take-and-print @ . cr ;
+zf> speed take-and-print
+27 \ in m/s
+
+```
+
 ## Links
 
 * [Starting FORTH](https://www.forth.com/starting-forth/)
