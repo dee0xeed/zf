@@ -96,6 +96,11 @@ pub fn xorImpl(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(res);
 }
 
+pub fn invertImpl(vm: *VirtualStackMachine) !void {
+    const n = try vm.dstk.pop();
+    try vm.dstk.push(~n);
+}
+
 pub fn addImpl(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();

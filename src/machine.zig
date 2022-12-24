@@ -375,6 +375,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "and",   .func = &rt.andImpl},
             .{.name = "or",    .func = &rt.orImpl},
             .{.name = "xor",   .func = &rt.xorImpl},
+            .{.name = "inv",   .func = &rt.invertImpl},
             .{.name = "+",     .func = &rt.addImpl},
             .{.name = "1+",    .func = &rt.incImpl},
             .{.name = "-",     .func = &rt.subImpl},
