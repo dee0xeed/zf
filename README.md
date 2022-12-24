@@ -5,11 +5,8 @@ An implementation of FORTH-like virtual stack machine in Zig
 
 ```
 zf> .dict
-bye . cr .dict .dstk .rstk .cstk .code
-dup drop
-+ 1+ - 1- * / mod = <> > < 0= 0<> 0> 0< max min
-: ;
-if else then do iter i loop next begin again until (
+bye . cr .dict .dstk .rstk .text .data dup drop + 1+ - 1- * / mod = <> > < 0= 0<> 0> 0<
+max min ! @ allot create : ; if else then do iter i loop next begin again until (
 ```
 
 ## shell
@@ -19,21 +16,21 @@ vm.code[0] = vm.dict.getWordNumber("prom").?;
 vm.code[1] = vm.dict.getWordNumber("read").?;
 vm.code[2] = vm.dict.getWordNumber("jifz").?;
 vm.code[3] = 7;
-vm.code[4] = vm.dict.getWordNumber("exec").?;
+vm.code[4] = vm.dict.getWordNumber("proc").?;
 vm.code[5] = vm.dict.getWordNumber("jump").?;
 vm.code[6] = 0;
 vm.code[7] = vm.dict.getWordNumber("bye").?;
 ```
 
 ```
-zf> .code
+zf> .text
 code[0] = 0xffffffffffffff01 // print 'zf> ' ('zf(c)> ' when "compiling") <--|
 code[1] = 0xffffffffffffff02 // read a word                                  |
 code[2] = 0xffffffffffffff05 // if TOS == 0, jump to                         |
 code[3] = 0x0000000000000007 // this location           -->|                 |
-code[4] = 0xffffffffffffff03 // execute the word           |                 |
-code[5] = 0xffffffffffffff04 // unconditional jump to the  |                 |
-code[6] = 0x0000000000000000 // beginning                  |              -->|
+code[4] = 0xffffffffffffff03 // process the word           |                 |
+code[5] = 0xffffffffffffff04 // unconditional jump         |                 |
+code[6] = 0x0000000000000000 // to the beginning           |              -->|
 code[7] = 0xffffffffffffff0b // bye                     <--|
 ```
 

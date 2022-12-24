@@ -52,6 +52,17 @@ pub const Dict = struct {
         return null;
     }
 
+    pub fn findWordByDpos(self: *Dict, dpos: usize) ?*Word {
+        var i: usize = 1;
+        while (i <= self.nwords) : (i += 1) {
+            if (self.words[i].dpos) |dp| {
+                if (dp == dpos)
+                    return &self.words[i];
+            }
+        }
+        return null;
+    }
+
     pub fn getWordNumber(self: *Dict, name: []const u8) ?usize {
         var i: usize = self.nwords;
         while (i > 0) : (i -= 1)
@@ -277,8 +288,11 @@ pub const VirtualStackMachine = struct {
 
     fn dumpData(self: *VirtualStackMachine) !void {
         var k: usize = 0;
-        while (k < self.dend) : (k += 1)
-            std.debug.print("data[{}] = 0x{x:0>16}\n", .{k, self.data[k]});
+        var w: *Word = undefined;
+        while (k < self.dend) : (k += 1) {
+            w = self.dict.findWordByDpos(k).?;
+            std.debug.print("data[{}] = 0x{x:0>16} ('{s}')\n", .{k, self.data[k], w.name});
+        }
     }
 
     fn enterCompileMode(self: *VirtualStackMachine) !void {
@@ -353,7 +367,7 @@ pub const VirtualStackMachine = struct {
             .{.name = ".dict", .func = &dumpDict},
             .{.name = ".dstk", .func = &dumpDataStack},
             .{.name = ".rstk", .func = &dumpReturnStack},
-            .{.name = ".code", .func = &dumpCode},
+            .{.name = ".text", .func = &dumpCode},
             .{.name = ".data", .func = &dumpData},
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
