@@ -75,6 +75,27 @@ pub fn swapImpl(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(b);
 }
 
+pub fn andImpl(vm: *VirtualStackMachine) !void {
+    const rhs = try vm.dstk.pop();
+    const lhs = try vm.dstk.pop();
+    const res = lhs & rhs;
+    try vm.dstk.push(res);
+}
+
+pub fn orImpl(vm: *VirtualStackMachine) !void {
+    const rhs = try vm.dstk.pop();
+    const lhs = try vm.dstk.pop();
+    const res = lhs | rhs;
+    try vm.dstk.push(res);
+}
+
+pub fn xorImpl(vm: *VirtualStackMachine) !void {
+    const rhs = try vm.dstk.pop();
+    const lhs = try vm.dstk.pop();
+    const res = lhs ^ rhs;
+    try vm.dstk.push(res);
+}
+
 pub fn addImpl(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
