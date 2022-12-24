@@ -68,6 +68,13 @@ pub fn dropImpl(vm: *VirtualStackMachine) !void {
     _ = try vm.dstk.pop();
 }
 
+pub fn swapImpl(vm: *VirtualStackMachine) !void {
+    const a = try vm.dstk.pop();
+    const b = try vm.dstk.pop();
+    try vm.dstk.push(a);
+    try vm.dstk.push(b);
+}
+
 pub fn addImpl(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();

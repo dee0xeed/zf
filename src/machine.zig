@@ -371,6 +371,7 @@ pub const VirtualStackMachine = struct {
             .{.name = ".data", .func = &dumpData},
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
+            .{.name = "swap",  .func = &rt.swapImpl},
             .{.name = "+",     .func = &rt.addImpl},
             .{.name = "1+",    .func = &rt.incImpl},
             .{.name = "-",     .func = &rt.subImpl},
