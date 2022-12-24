@@ -115,6 +115,28 @@ zf> speed take-and-print
 
 ```
 
+### using non-interactively
+
+```
+$ cat lib.zf app.zf | zig-out/bin/zf 
+zf> zf> zf> zf> 
+7 
+zf> 
+Bye, see you later!
+
+```
+
+```
+$ cat lib.zf 
+: var create 1 allot ;
+
+$ cat app.zf 
+var x
+7 x !
+cr x @ . cr
+
+```
+
 ## Links
 
 * [Starting FORTH](https://www.forth.com/starting-forth/)
