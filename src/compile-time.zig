@@ -5,6 +5,7 @@ const VirtualStackMachine = @import("machine.zig").VirtualStackMachine;
 pub fn compIf(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("jifz").?;
     try vm.compileWord(wn);
+    vm.meta[vm.cend] = .jump_location;
     try vm.dstk.push(vm.cend);
     vm.cend += 1;
 }
@@ -13,6 +14,7 @@ pub fn compElse(vm: *VirtualStackMachine) !void {
     const orig = try vm.dstk.pop();
     const wn = vm.dict.getWordNumber("jump").?;
     try vm.compileWord(wn);
+    vm.meta[vm.cend] = .jump_location;
     try vm.dstk.push(vm.cend);
     vm.cend += 1;
     vm.code[orig] = vm.cend;
@@ -40,6 +42,7 @@ pub fn compLoop(vm: *VirtualStackMachine) !void {
     try vm.compileWord(wn);
     const bwref = try vm.dstk.pop();
     vm.code[vm.cend] = bwref;
+    vm.meta[vm.cend] = .jump_location;
     vm.cend += 1;
 }
 
@@ -52,6 +55,7 @@ pub fn compAgain(vm: *VirtualStackMachine) !void {
     try vm.compileWord(wn);
     const bwref = try vm.dstk.pop();
     vm.code[vm.cend] = bwref;
+    vm.meta[vm.cend] = .jump_location;
     vm.cend += 1;
 }
 
@@ -60,6 +64,7 @@ pub fn compUntil(vm: *VirtualStackMachine) !void {
     try vm.compileWord(wn);
     const bwref = try vm.dstk.pop();
     vm.code[vm.cend] = bwref;
+    vm.meta[vm.cend] = .jump_location;
     vm.cend += 1;
 }
 

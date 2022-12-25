@@ -19,7 +19,6 @@ pub const Word = struct {
 pub const Dict = struct {
 
     const cap: usize = 256;
-    const mask: usize = ~ (cap - 1);
     const Error = error {
         DictionaryIsFull,
     };
@@ -67,7 +66,7 @@ pub const Dict = struct {
         var i: usize = self.nwords;
         while (i > 0) : (i -= 1)
             if (std.mem.eql(u8, name, self.words[i].name))
-                return i | mask;
+                return i;
         return null;
     }
 };
@@ -92,17 +91,24 @@ pub const VirtualStackMachine = struct {
         compiling,
     };
 
+    const Meta = enum {
+        word_number,
+        jump_location,
+        numb_literal,
+    };
+
     stop: bool = false,
     dict: Dict,
     nwords: usize = 0,
-    dstk: Stack,                    // data stack
-    rstk: Stack,                    // return stack
-    code: [CODE_CAP]usize = undefined,
-    cptr: usize = 0,                // "instruction pointer"/"program counter"
-    cend: usize = 0,                // first free code cell
-    data: [DATA_CAP]usize = undefined,
-    dend: usize = 0,                // first free data cell (`HERE`)
-    ibuf: [256]u8 = undefined,      // input buffer
+    dstk: Stack,                        // data stack
+    rstk: Stack,                        // return stack
+    code: [CODE_CAP]usize = undefined,  //
+    meta: [CODE_CAP]Meta = undefined,   //
+    cptr: usize = 0,                    // "instruction pointer"/"program counter"
+    cend: usize = 0,                    // first free code cell
+    data: [DATA_CAP]usize = undefined,  //
+    dend: usize = 0,                    // first free data cell (`HERE`)
+    ibuf: [256]u8 = undefined,          // input buffer
     bcnt: usize = 0,
     need_prompt: bool = true,
     mode: Mode = .interpreting,
@@ -198,10 +204,11 @@ pub const VirtualStackMachine = struct {
 
         const wnum = self.dict.getWordNumber(name);
         if (wnum) |wn| {
-            const word = &self.dict.words[wn & ~Dict.mask];
+            const word = &self.dict.words[wn];
             if (true == word.comp) {
                 try word.func(self);
             } else {
+                self.meta[self.cend] = .word_number;
                 try self.compileWord(wn);
             }
             return;
@@ -216,6 +223,7 @@ pub const VirtualStackMachine = struct {
         // compile number literal
         const wn = self.dict.getWordNumber("lit").?;
         try self.compileWord(wn);
+        self.meta[self.cend] = .numb_literal;
         try self.compileWord(@bitCast(usize, number));
     }
 
@@ -282,8 +290,19 @@ pub const VirtualStackMachine = struct {
 
     fn dumpCode(self: *VirtualStackMachine) !void {
         var k: usize = 0;
-        while (k < self.cend) : (k += 1)
-            std.debug.print("code[{}] = 0x{x:0>16}\n", .{k, self.code[k]});
+        while (k < self.cend) : (k += 1) {
+            const code = self.code[k];
+            std.debug.print("text[{x:0>4}] = {x:0>16} ", .{k, code});
+            switch (self.meta[k]) {
+            .word_number => {
+                const word = &self.dict.words[code];
+                std.debug.print("{s}", .{word.name});
+            },
+            .jump_location => std.debug.print("(whereto)", .{}),
+            .numb_literal => std.debug.print("(number)", .{}),
+            }
+            std.debug.print("\n", .{});
+        }
     }
 
     fn dumpData(self: *VirtualStackMachine) !void {
@@ -437,6 +456,16 @@ pub const VirtualStackMachine = struct {
         vm.code[6] = 0;
         vm.code[7] = vm.dict.getWordNumber("bye").?;
         vm.cend = 8;
+
+        vm.meta[0] = .word_number;
+        vm.meta[1] = .word_number;
+        vm.meta[2] = .word_number;
+        vm.meta[3] = .jump_location;
+        vm.meta[4] = .word_number;
+        vm.meta[5] = .word_number;
+        vm.meta[6] = .jump_location;
+        vm.meta[7] = .word_number;
+
         return vm;
     }
 
@@ -458,7 +487,6 @@ pub const VirtualStackMachine = struct {
         while (false == self.stop) {
 
             var wnum = self.code[self.cptr];
-            wnum &= ~Dict.mask;
             if ((0 == wnum) or (wnum > self.dict.nwords)) {
                 std.debug.print("wnum = 0x{x:0>16}\n", .{wnum});
                 return Error.WordNumberOutOfRange;
