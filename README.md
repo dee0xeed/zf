@@ -144,3 +144,42 @@ cr x ?
 * [Open FirmWare/Forth Lessons](https://wiki.laptop.org/go/Forth_Lessons)
 * [Implementing a FORTH virtual machine](http://www.w3group.de/forth_course.html)
 * [MuP21 instruction set](https://groups.google.com/g/comp.lang.forth/c/7UULcFs7kas)
+
+## ...
+
+```
+zf> .text
+text[0000] = 0000000000000001 prom
+text[0001] = 0000000000000002 read
+text[0002] = 0000000000000005 jifz
+text[0003] = 0000000000000007 (whereto)
+text[0004] = 0000000000000003 proc
+text[0005] = 0000000000000004 jump
+text[0006] = 0000000000000000 (whereto)
+text[0007] = 000000000000000b bye
+```
+now add some word
+
+```
+: odd? 1 and 0<> if 1 else 0 then . cr ;
+```
+
+```
+zf> .text
+...
+text[0008] = 0000000000000007 lit
+text[0009] = 0000000000000001 (number)
+text[000a] = 0000000000000016 and
+text[000b] = 0000000000000026 0<>
+text[000c] = 0000000000000005 jifz
+text[000d] = 0000000000000012 (whereto)
+text[000e] = 0000000000000007 lit
+text[000f] = 0000000000000001 (number)
+text[0010] = 0000000000000004 jump
+text[0011] = 0000000000000014 (whereto)
+text[0012] = 0000000000000007 lit
+text[0013] = 0000000000000000 (number)
+text[0014] = 000000000000000c .
+text[0015] = 000000000000000d cr
+text[0016] = 0000000000000006 return
+```
