@@ -402,7 +402,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "max",   .func = &rt.maxImpl},
             .{.name = "min",   .func = &rt.minImpl},
             .{.name = "!",     .func = &rt.storeImpl},
-            .{.name = "+!",    .func = &rt.plusStoreImpl},
+//            .{.name = "+!",    .func = &rt.plusStoreImpl},
             .{.name = "@",     .func = &rt.loadImpl},
 
             // shell

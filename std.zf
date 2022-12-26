@@ -3,3 +3,4 @@
 : ? @ . cr ;
 : r@ r> dup >r ;
 : i r> r> dup >r swap >r ;
+: +! dup @ rot + swap ! ;

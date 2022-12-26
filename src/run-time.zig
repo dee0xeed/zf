@@ -242,13 +242,6 @@ pub fn storeImpl(vm: *VirtualStackMachine) !void {
     vm.data[addr] = numb;
 }
 
-pub fn plusStoreImpl(vm: *VirtualStackMachine) !void {
-    const addr = try vm.dstk.pop();
-    const incr = @bitCast(isize, try vm.dstk.pop());
-    const rslt = @bitCast(isize, vm.data[addr]) + incr;
-    vm.data[addr] = @bitCast(usize, rslt);
-}
-
 pub fn allotImpl(vm: *VirtualStackMachine) !void {
     const d = @bitCast(isize, try vm.dstk.pop());
     const n = @bitCast(isize, vm.dend) + d;
