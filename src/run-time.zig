@@ -119,22 +119,10 @@ pub fn addImpl(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(@bitCast(usize, res));
 }
 
-pub fn incImpl(vm: *VirtualStackMachine) !void {
-    const num = @bitCast(isize, try vm.dstk.pop());
-    const res = num + @as(isize, 1);
-    try vm.dstk.push(@bitCast(usize, res));
-}
-
 pub fn subImpl(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) - @bitCast(isize, rhs);
-    try vm.dstk.push(@bitCast(usize, res));
-}
-
-pub fn decImpl(vm: *VirtualStackMachine) !void {
-    const num = @bitCast(isize, try vm.dstk.pop());
-    const res = num - @as(isize, 1);
     try vm.dstk.push(@bitCast(usize, res));
 }
 

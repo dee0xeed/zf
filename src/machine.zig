@@ -385,9 +385,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "xor",   .func = &rt.xorImpl},
             .{.name = "inv",   .func = &rt.invertImpl},
             .{.name = "+",     .func = &rt.addImpl},
-            .{.name = "1+",    .func = &rt.incImpl},
             .{.name = "-",     .func = &rt.subImpl},
-            .{.name = "1-",    .func = &rt.decImpl},
             .{.name = "*",     .func = &rt.mulImpl},
             .{.name = "/",     .func = &rt.divImpl},
             .{.name = "mod",   .func = &rt.modImpl},
@@ -402,7 +400,6 @@ pub const VirtualStackMachine = struct {
             .{.name = "max",   .func = &rt.maxImpl},
             .{.name = "min",   .func = &rt.minImpl},
             .{.name = "!",     .func = &rt.storeImpl},
-//            .{.name = "+!",    .func = &rt.plusStoreImpl},
             .{.name = "@",     .func = &rt.loadImpl},
 
             // shell
