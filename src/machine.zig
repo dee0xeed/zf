@@ -296,10 +296,10 @@ pub const VirtualStackMachine = struct {
             switch (self.meta[k]) {
             .word_number => {
                 const word = &self.dict.words[code];
-                std.debug.print("{s}", .{word.name});
+                std.debug.print("`{s}`", .{word.name});
             },
-            .jump_location => std.debug.print("(whereto)", .{}),
-            .numb_literal => std.debug.print("(number)", .{}),
+            .jump_location => std.debug.print("(to {x})", .{code}),
+            .numb_literal => std.debug.print("({d})", .{code}),
             }
             std.debug.print("\n", .{});
         }
@@ -375,8 +375,8 @@ pub const VirtualStackMachine = struct {
             .{.name = "jifz",   .func = &rt.jifzImpl, .hidd = true},
             .{.name = "return", .func = &rt.returnImpl, .hidd = true},
             .{.name = "lit",    .func = &rt.litImpl,  .hidd = true},
-            .{.name = "doRT",   .func = &rt.doImpl, .hidd = true},
-            .{.name = "loopRT", .func = &rt.loopImpl, .hidd = true},
+            .{.name = "do-rt",   .func = &rt.doImpl, .hidd = true},
+            .{.name = "loop-rt", .func = &rt.loopImpl, .hidd = true},
             .{.name = "index",  .func = &rt.indexImpl, .hidd = true},
 
             // visible (interpretable)

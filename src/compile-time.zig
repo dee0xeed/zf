@@ -27,7 +27,7 @@ pub fn compThen(vm: *VirtualStackMachine) !void {
 }
 
 pub fn compDo(vm: *VirtualStackMachine) !void {
-    const wn = vm.dict.getWordNumber("doRT").?;
+    const wn = vm.dict.getWordNumber("do-rt").?;
     try vm.compileWord(wn);
     try vm.dstk.push(vm.cend);
 }
@@ -38,7 +38,7 @@ pub fn compIndex(vm: *VirtualStackMachine) !void {
 }
 
 pub fn compLoop(vm: *VirtualStackMachine) !void {
-    const wn = vm.dict.getWordNumber("loopRT").?;
+    const wn = vm.dict.getWordNumber("loop-rt").?;
     try vm.compileWord(wn);
     const bwref = try vm.dstk.pop();
     vm.code[vm.cend] = bwref;
