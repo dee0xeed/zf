@@ -101,7 +101,6 @@ pub const VirtualStackMachine = struct {
 
     stop: bool = false,
     dict: Dict,
-    nwords: usize = 0,
     dstk: Stack,                        // data stack
     rstk: Stack,                        // return stack
     code: [CODE_CAP]usize = undefined,  //
@@ -186,8 +185,6 @@ pub const VirtualStackMachine = struct {
         std.debug.print("'\n", .{});
     }
 
-    // add a word to the code
-    //pub fn compileWord(self: *VirtualStackMachine, wn: usize) !void {
     pub fn appendText(self: *VirtualStackMachine, val: usize, meta: Meta) !void {
         if (CODE_CAP == self.cend)
             return Error.CodeSpaceIsFull;
@@ -371,34 +368,18 @@ pub const VirtualStackMachine = struct {
 
         const builtins: []const Word = &[_]Word {
 
-            // hidden
-            .{.name = "prom", .func = &promImpl, .hidd = true},
-            .{.name = "read", .func = &readWord, .hidd = true},
-            .{.name = "proc", .func = &procWord, .hidd = true},
-
+            // "instruction set"
             .{.name = "jump",   .func = &rt.jumpImpl, .hidd = true},
             .{.name = "jifz",   .func = &rt.jifzImpl, .hidd = true},
             .{.name = "return", .func = &rt.returnImpl, .hidd = true},
             .{.name = "lit",    .func = &rt.litImpl,  .hidd = true},
-//            .{.name = "do-rt",   .func = &rt.doImpl, .hidd = true},
-            .{.name = "loop-rt", .func = &rt.loopImpl, .hidd = true},
-            .{.name = "index",  .func = &rt.indexImpl, .hidd = true},
-
-            // visible (interpretable)
-            .{.name = "bye",   .func = &sayGoodbye},
-            .{.name = ".",     .func = &dotImpl},
-            .{.name = "cr",    .func = &crImpl},
-            .{.name = ".dict", .func = &dumpDict},
-            .{.name = ".dstk", .func = &dumpDataStack},
-            .{.name = ".rstk", .func = &dumpReturnStack},
-            .{.name = ".text", .func = &dumpCode},
-            .{.name = ".data", .func = &dumpData},
+            .{.name = "loop-rt", .func = &rt.loopImpl, .hidd = true}, // ...
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
             .{.name = "swap",  .func = &rt.swapImpl},
             .{.name = "rot",   .func = &rt.rotImpl},
-            .{.name = ">R",    .func = &rt.pushImpl},
-            .{.name = "R>",    .func = &rt.popImpl},
+            .{.name = ">r",    .func = &rt.pushImpl},
+            .{.name = "r>",    .func = &rt.popImpl},
             .{.name = "and",   .func = &rt.andImpl},
             .{.name = "or",    .func = &rt.orImpl},
             .{.name = "xor",   .func = &rt.xorImpl},
@@ -424,13 +405,26 @@ pub const VirtualStackMachine = struct {
             .{.name = "+!",    .func = &rt.plusStoreImpl},
             .{.name = "@",     .func = &rt.loadImpl},
 
+            // shell
+            .{.name = "prom",  .func = &promImpl, .hidd = true},
+            .{.name = "read",  .func = &readWord, .hidd = true},
+            .{.name = "proc",  .func = &procWord, .hidd = true},
+            .{.name = "bye",   .func = &sayGoodbye},
+            .{.name = ".",     .func = &dotImpl},
+            .{.name = "cr",    .func = &crImpl},
+            .{.name = ".dict", .func = &dumpDict},
+            .{.name = ".dstk", .func = &dumpDataStack},
+            .{.name = ".rstk", .func = &dumpReturnStack},
+            .{.name = ".text", .func = &dumpCode},
+            .{.name = ".data", .func = &dumpData},
+
+            // ???
             .{.name = "allot", .func = &rt.allotImpl},
 
             // defining words
             .{.name = "create", .func = &makeAddrWord},
             .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "val", .func = &},
-//            .{.name = "create", .func = &},
 
             // compiling words
             .{.name = ";",    .func = &ct.leaveCompileMode, .comp = true},
@@ -439,7 +433,6 @@ pub const VirtualStackMachine = struct {
             .{.name = "then", .func = &ct.compThen, .comp = true},
             .{.name = "do",   .func = &ct.compDo, .comp = true},
             .{.name = "iter",   .func = &ct.compDo, .comp = true},
-            .{.name = "i",    .func = &ct.compIndex, .comp = true},
 //            .{.name = "break", .func = &ct.breakImpl, .comp = true},
 //            .{.name = "leave", .func = &ct.breakImpl, .comp = true},
             .{.name = "loop", .func = &ct.compLoop, .comp = true},
@@ -452,7 +445,6 @@ pub const VirtualStackMachine = struct {
 
         for (builtins) |w|
             _ = try vm.dict.addWord(w);
-        vm.nwords = vm.dict.nwords;
 
         // construct (i.e. "compile") processing loop by hand
         vm.code[0] = vm.dict.getWordNumber("prom").?;
@@ -486,7 +478,6 @@ pub const VirtualStackMachine = struct {
         self.dend = 0;
         self.cptr = 0;
         self.mode = .interpreting;
-        self.dict.nwords = self.nwords;
         std.debug.print("machine reset\n", .{});
     }
 

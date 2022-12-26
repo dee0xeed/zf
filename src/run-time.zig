@@ -24,16 +24,6 @@ pub fn returnImpl(vm: *VirtualStackMachine) !void {
     vm.cptr = try vm.rstk.pop();
 }
 
-// DO I LOOP
-// https://stackoverflow.com/questions/6949434/how-to-implement-loop-in-a-forth-like-language-interpreter-written-in-c
-
-//pub fn doImpl(vm: *VirtualStackMachine) !void {
-//    const index = try vm.dstk.pop();
-//    const limit = try vm.dstk.pop();
-//    try vm.rstk.push(limit);
-//    try vm.rstk.push(index);
-//}
-
 pub fn indexImpl(vm: *VirtualStackMachine) !void {
     const index = vm.rstk.mem[vm.rstk.top];
     try vm.dstk.push(index);

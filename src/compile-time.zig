@@ -30,12 +30,8 @@ pub fn compDo(vm: *VirtualStackMachine) !void {
     //const wn = vm.dict.getWordNumber("do-rt").?; // "native"
     const wn = vm.dict.getWordNumber("do-impl").?; // "forth"
     try vm.appendText(wn, .word_number);
+    // 
     try vm.dstk.push(vm.cend);
-}
-
-pub fn compIndex(vm: *VirtualStackMachine) !void {
-    const wn = vm.dict.getWordNumber("index").?;
-    try vm.appendText(wn, .word_number);
 }
 
 pub fn compLoop(vm: *VirtualStackMachine) !void {
