@@ -1,22 +1,22 @@
 
 const std = @import("std");
 const VirtualStackMachine = @import("machine.zig").VirtualStackMachine;
+const UNRESOLVED: usize = 0xFFFFFFFFFFFFFFFF;
 
 pub fn compIf(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("jifz").?;
-    try vm.compileWord(wn);
-    vm.meta[vm.cend] = .jump_location;
+    try vm.appendText(wn, .word_number);
     try vm.dstk.push(vm.cend);
-    vm.cend += 1;
+    try vm.appendText(UNRESOLVED, .jump_location);
 }
 
 pub fn compElse(vm: *VirtualStackMachine) !void {
     const orig = try vm.dstk.pop();
     const wn = vm.dict.getWordNumber("jump").?;
-    try vm.compileWord(wn);
-    vm.meta[vm.cend] = .jump_location;
+    try vm.appendText(wn, .word_number);
     try vm.dstk.push(vm.cend);
-    vm.cend += 1;
+    try vm.appendText(UNRESOLVED, .jump_location);
+    // resolve `if` forward reference
     vm.code[orig] = vm.cend;
 }
 
@@ -28,22 +28,23 @@ pub fn compThen(vm: *VirtualStackMachine) !void {
 
 pub fn compDo(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("do-rt").?;
-    try vm.compileWord(wn);
+    try vm.appendText(wn, .word_number);
     try vm.dstk.push(vm.cend);
 }
 
 pub fn compIndex(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("index").?;
-    try vm.compileWord(wn);
+    try vm.appendText(wn, .word_number);
 }
 
 pub fn compLoop(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("loop-rt").?;
-    try vm.compileWord(wn);
+    try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
-    vm.code[vm.cend] = bwref;
-    vm.meta[vm.cend] = .jump_location;
-    vm.cend += 1;
+    try vm.appendText(bwref, .jump_location);
+//    vm.code[vm.cend] = bwref;
+//    vm.meta[vm.cend] = .jump_location;
+//    vm.cend += 1;
 }
 
 pub fn compBegin(vm: *VirtualStackMachine) !void {
@@ -52,25 +53,27 @@ pub fn compBegin(vm: *VirtualStackMachine) !void {
 
 pub fn compAgain(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("jump").?;
-    try vm.compileWord(wn);
+    try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
-    vm.code[vm.cend] = bwref;
-    vm.meta[vm.cend] = .jump_location;
-    vm.cend += 1;
+    try vm.appendText(bwref, .jump_location);
+//    vm.code[vm.cend] = bwref;
+//    vm.meta[vm.cend] = .jump_location;
+//    vm.cend += 1;
 }
 
 pub fn compUntil(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("jifz").?;
-    try vm.compileWord(wn);
+    try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
-    vm.code[vm.cend] = bwref;
-    vm.meta[vm.cend] = .jump_location;
-    vm.cend += 1;
+    try vm.appendText(bwref, .jump_location);
+    //vm.code[vm.cend] = bwref;
+    //vm.meta[vm.cend] = .jump_location;
+    //vm.cend += 1;
 }
 
 pub fn leaveCompileMode(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("return").?;
-    try vm.compileWord(wn);
+    try vm.appendText(wn, .word_number);
     vm.mode = .interpreting;
 }
 

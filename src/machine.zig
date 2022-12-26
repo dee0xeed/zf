@@ -184,10 +184,12 @@ pub const VirtualStackMachine = struct {
     }
 
     // add a word to the code
-    pub fn compileWord(self: *VirtualStackMachine, wn: usize) !void {
+    //pub fn compileWord(self: *VirtualStackMachine, wn: usize) !void {
+    pub fn appendText(self: *VirtualStackMachine, val: usize, meta: Meta) !void {
         if (CODE_CAP == self.cend)
             return Error.CodeSpaceIsFull;
-        self.code[self.cend] = wn;
+        self.code[self.cend] = val;
+        self.meta[self.cend] = meta;
         self.cend += 1;
     }
 
@@ -208,8 +210,7 @@ pub const VirtualStackMachine = struct {
             if (true == word.comp) {
                 try word.func(self);
             } else {
-                self.meta[self.cend] = .word_number;
-                try self.compileWord(wn);
+                try self.appendText(wn, .word_number);
             }
             return;
         }
@@ -222,9 +223,8 @@ pub const VirtualStackMachine = struct {
 
         // compile number literal
         const wn = self.dict.getWordNumber("lit").?;
-        try self.compileWord(wn);
-        self.meta[self.cend] = .numb_literal;
-        try self.compileWord(@bitCast(usize, number));
+        try self.appendText(wn, .word_number);
+        try self.appendText(@bitCast(usize, number), .numb_literal);
     }
 
     fn execute(self: *VirtualStackMachine, name: []const u8) !void {
