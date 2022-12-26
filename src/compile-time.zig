@@ -16,12 +16,12 @@ pub fn compElse(vm: *VirtualStackMachine) !void {
     try vm.appendText(wn, .word_number);
     try vm.dstk.push(vm.cend);
     try vm.appendText(UNRESOLVED, .jump_location);
-    // resolve `if` forward reference
+    // resolve `jifz` forward reference
     vm.code[orig] = vm.cend;
 }
 
 pub fn compThen(vm: *VirtualStackMachine) !void {
-    // resolve `if`/`else` forward reference
+    // resolve `jifz` (in if) or `jump` (in else) forward references
     const orig = try vm.dstk.pop();
     vm.code[orig] = vm.cend;
 }
@@ -42,9 +42,6 @@ pub fn compLoop(vm: *VirtualStackMachine) !void {
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
     try vm.appendText(bwref, .jump_location);
-//    vm.code[vm.cend] = bwref;
-//    vm.meta[vm.cend] = .jump_location;
-//    vm.cend += 1;
 }
 
 pub fn compBegin(vm: *VirtualStackMachine) !void {
@@ -56,9 +53,6 @@ pub fn compAgain(vm: *VirtualStackMachine) !void {
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
     try vm.appendText(bwref, .jump_location);
-//    vm.code[vm.cend] = bwref;
-//    vm.meta[vm.cend] = .jump_location;
-//    vm.cend += 1;
 }
 
 pub fn compUntil(vm: *VirtualStackMachine) !void {
@@ -66,9 +60,6 @@ pub fn compUntil(vm: *VirtualStackMachine) !void {
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
     try vm.appendText(bwref, .jump_location);
-    //vm.code[vm.cend] = bwref;
-    //vm.meta[vm.cend] = .jump_location;
-    //vm.cend += 1;
 }
 
 pub fn leaveCompileMode(vm: *VirtualStackMachine) !void {
