@@ -6,3 +6,5 @@
 : +! dup @ rot + swap ! ;
 : 1+ 1 + ;
 : 1- 1 - ;
+: max dup rot dup rot > if swap drop else drop then ;
+: min dup rot dup rot < if swap drop else drop then ;

@@ -199,26 +199,12 @@ pub fn ltzImpl(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn maxImpl(vm: *VirtualStackMachine) !void {
-    const rhs = @bitCast(isize, try vm.dstk.pop());
-    const lhs = @bitCast(isize, try vm.dstk.pop());
-    const res = if (lhs > rhs) lhs else rhs;
-    try vm.dstk.push(@bitCast(usize, res));
-}
-
-pub fn minImpl(vm: *VirtualStackMachine) !void {
-    const rhs = @bitCast(isize, try vm.dstk.pop());
-    const lhs = @bitCast(isize, try vm.dstk.pop());
-    const res = if (lhs < rhs) lhs else rhs;
-    try vm.dstk.push(@bitCast(usize, res));
-}
-
 pub fn addrImpl(vm: *VirtualStackMachine) !void {
     const addr = vm.current_word.dpos.?;
     try vm.dstk.push(addr);
 }
 
-pub fn loadImpl(vm: *VirtualStackMachine) !void {
+pub fn fetchImpl(vm: *VirtualStackMachine) !void {
     const addr = try vm.dstk.pop();
     const numb = vm.data[addr];
     try vm.dstk.push(numb);

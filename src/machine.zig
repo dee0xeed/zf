@@ -397,10 +397,8 @@ pub const VirtualStackMachine = struct {
             .{.name = "0<>",   .func = &rt.nezImpl},
             .{.name = "0>",    .func = &rt.gtzImpl},
             .{.name = "0<",    .func = &rt.ltzImpl},
-            .{.name = "max",   .func = &rt.maxImpl},
-            .{.name = "min",   .func = &rt.minImpl},
             .{.name = "!",     .func = &rt.storeImpl},
-            .{.name = "@",     .func = &rt.loadImpl},
+            .{.name = "@",     .func = &rt.fetchImpl},
 
             // shell
             .{.name = "prom",  .func = &promImpl, .hidd = true},
