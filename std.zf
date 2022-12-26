@@ -8,7 +8,7 @@
 : 1- 1 - ;
 : max dup rot dup rot > if swap drop else drop then ;
 : min dup rot dup rot < if swap drop else drop then ;
-: 0= 0 = if 1 else 0 then ;
-: 0<> 0 <> if 1 else 0 then ;
-: 0> 0 > if 1 else 0 then ;
-: 0< 0 < if 1 else 0 then ;
+: 0= 0 = ;
+: 0<> 0 <> ;
+: 0> 0 > ;
+: 0< 0 < ;
