@@ -393,10 +393,6 @@ pub const VirtualStackMachine = struct {
             .{.name = "<>",    .func = &rt.neqImpl},
             .{.name = ">",     .func = &rt.gtImpl},
             .{.name = "<",     .func = &rt.ltImpl},
-            .{.name = "0=",    .func = &rt.eqzImpl},
-            .{.name = "0<>",   .func = &rt.nezImpl},
-            .{.name = "0>",    .func = &rt.gtzImpl},
-            .{.name = "0<",    .func = &rt.ltzImpl},
             .{.name = "!",     .func = &rt.storeImpl},
             .{.name = "@",     .func = &rt.fetchImpl},
 

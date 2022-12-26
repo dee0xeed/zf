@@ -154,22 +154,10 @@ pub fn eqlImpl(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn eqzImpl(vm: *VirtualStackMachine) !void {
-    const num = try vm.dstk.pop();
-    const res: bool = (num == 0);
-    try vm.dstk.push(@boolToInt(res));
-}
-
 pub fn neqImpl(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res: bool = (lhs != rhs);
-    try vm.dstk.push(@boolToInt(res));
-}
-
-pub fn nezImpl(vm: *VirtualStackMachine) !void {
-    const num = try vm.dstk.pop();
-    const res: bool = (num != 0);
     try vm.dstk.push(@boolToInt(res));
 }
 
@@ -180,22 +168,10 @@ pub fn gtImpl(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn gtzImpl(vm: *VirtualStackMachine) !void {
-    const num = @bitCast(isize, try vm.dstk.pop());
-    const res: bool = (num > 0);
-    try vm.dstk.push(@boolToInt(res));
-}
-
 pub fn ltImpl(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) < @bitCast(isize, rhs);
-    try vm.dstk.push(@boolToInt(res));
-}
-
-pub fn ltzImpl(vm: *VirtualStackMachine) !void {
-    const num = @bitCast(isize, try vm.dstk.pop());
-    const res: bool = (num < 0);
     try vm.dstk.push(@boolToInt(res));
 }
 
