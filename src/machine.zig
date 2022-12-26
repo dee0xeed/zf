@@ -1,5 +1,7 @@
 
 const std = @import("std");
+const os = std.os;
+const mem = std.mem;
 const Stack = @import("stack.zig").Stack;
 const ct = @import("compile-time.zig");
 const rt = @import("run-time.zig");
@@ -42,7 +44,7 @@ pub const Dict = struct {
     pub fn findWord(self: *Dict, name: []const u8) ?*Word {
         var i: usize = self.nwords;
         while (i > 0) : (i -= 1) {
-            if (std.mem.eql(u8, name, self.words[i].name)) {
+            if (mem.eql(u8, name, self.words[i].name)) {
                 if (true == self.words[i].hidd)
                     break;
                 return &self.words[i];
@@ -65,7 +67,7 @@ pub const Dict = struct {
     pub fn getWordNumber(self: *Dict, name: []const u8) ?usize {
         var i: usize = self.nwords;
         while (i > 0) : (i -= 1)
-            if (std.mem.eql(u8, name, self.words[i].name))
+            if (mem.eql(u8, name, self.words[i].name))
                 return i;
         return null;
     }
@@ -113,6 +115,7 @@ pub const VirtualStackMachine = struct {
     need_prompt: bool = true,
     mode: Mode = .interpreting,
     current_word: *Word = undefined,
+    fd: i32 = 0,
 
     fn dotImpl(vm: *VirtualStackMachine) !void {
         const n = try vm.dstk.pop();
@@ -122,15 +125,15 @@ pub const VirtualStackMachine = struct {
 
     fn crImpl(self: *VirtualStackMachine) !void {
         _ = self;
-        _ = try std.os.write(1, "\n");
+        _ = try os.write(1, "\n");
     }
 
     fn promImpl(self: *VirtualStackMachine) !void {
         if (self.need_prompt) {
             if (.compiling == self.mode) {
-                _ = try std.os.write(1, "zf(c)> ");
+                _ = try os.write(1, "zf(c)> ");
             } else {
-                _ = try std.os.write(1, "zf> ");
+                _ = try os.write(1, "zf> ");
             }
             self.need_prompt = false;
         }
@@ -144,7 +147,7 @@ pub const VirtualStackMachine = struct {
 
         byte[0] = ' ';
         while (' ' == byte[0]) {
-            res = try std.os.read(0, byte[0..]);
+            res = try os.read(self.fd, byte[0..]);
             if (0 == res) {
                 try self.dstk.push(0);
                 return;
@@ -154,7 +157,7 @@ pub const VirtualStackMachine = struct {
         while ('\n' != byte[0]) {
             self.ibuf[cnt] = byte[0];
             cnt += 1;
-            res = try std.os.read(0, byte[0..]);
+            res = try os.read(self.fd, byte[0..]);
             if (0 == res) {
                 try self.dstk.push(0);
                 return;
@@ -170,15 +173,15 @@ pub const VirtualStackMachine = struct {
         try self.dstk.push(1);
     }
 
-    fn drain() !void {
+    fn drain(self: *VirtualStackMachine) !void {
         var n: u32 = 0;
         var b: [1]u8 = undefined;
         std.debug.print("discarded input: '", .{});
         while (true) {
-            _ = std.os.linux.ioctl(0, std.os.linux.T.FIONREAD, @ptrToInt(&n));
+            _ = os.linux.ioctl(0, os.linux.T.FIONREAD, @ptrToInt(&n));
             if (0 == n) break;
-            _ = try std.os.read(0, b[0..]);
-            _ = try std.os.write(1, b[0..]);
+            _ = try os.read(self.fd, b[0..]);
+            _ = try os.write(1, b[0..]);
         }
         std.debug.print("'\n", .{});
     }
@@ -198,8 +201,9 @@ pub const VirtualStackMachine = struct {
         // string? TODO...
         // if ('"' == ) {}
         // const name = self.ibuf[0..self.bcnt];
+        // std.debug.print("compiling '{s}'\n", .{name});
 
-        if (std.mem.eql(u8, name, ":")) {
+        if (mem.eql(u8, name, ":")) {
             std.debug.print("'{s}' inside word definition\n", .{name});
             return Error.ColonInsideWordDefinition;
         }
@@ -296,9 +300,9 @@ pub const VirtualStackMachine = struct {
             switch (self.meta[k]) {
             .word_number => {
                 const word = &self.dict.words[code];
-                std.debug.print("`{s}`", .{word.name});
+                std.debug.print("'{s}'", .{word.name});
             },
-            .jump_location => std.debug.print("(to {x})", .{code}),
+            .jump_location => std.debug.print("(-->{x})", .{code}),
             .numb_literal => std.debug.print("({d})", .{code}),
             }
             std.debug.print("\n", .{});
@@ -320,10 +324,10 @@ pub const VirtualStackMachine = struct {
         const name = self.ibuf[0..self.bcnt];
 
         if (
-            std.mem.eql(u8, name, ";") or
-            std.mem.eql(u8, name, ":") or
-            std.mem.eql(u8, name, "(") or
-            std.mem.eql(u8, name, ")")
+            mem.eql(u8, name, ";") or
+            mem.eql(u8, name, ":") or
+            mem.eql(u8, name, "(") or
+            mem.eql(u8, name, ")")
         ) {
             std.debug.print("word can not be named '{s}'\n", .{name});
             return Error.IllegalWordName;
@@ -375,7 +379,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "jifz",   .func = &rt.jifzImpl, .hidd = true},
             .{.name = "return", .func = &rt.returnImpl, .hidd = true},
             .{.name = "lit",    .func = &rt.litImpl,  .hidd = true},
-            .{.name = "do-rt",   .func = &rt.doImpl, .hidd = true},
+//            .{.name = "do-rt",   .func = &rt.doImpl, .hidd = true},
             .{.name = "loop-rt", .func = &rt.loopImpl, .hidd = true},
             .{.name = "index",  .func = &rt.indexImpl, .hidd = true},
 
@@ -391,6 +395,9 @@ pub const VirtualStackMachine = struct {
             .{.name = "dup",   .func = &rt.dupImpl},
             .{.name = "drop",  .func = &rt.dropImpl},
             .{.name = "swap",  .func = &rt.swapImpl},
+            .{.name = "rot",   .func = &rt.rotImpl},
+            .{.name = ">R",    .func = &rt.pushImpl},
+            .{.name = "R>",    .func = &rt.popImpl},
             .{.name = "and",   .func = &rt.andImpl},
             .{.name = "or",    .func = &rt.orImpl},
             .{.name = "xor",   .func = &rt.xorImpl},
@@ -470,7 +477,7 @@ pub const VirtualStackMachine = struct {
     }
 
     fn reset(self: *VirtualStackMachine) !void {
-        try drain();
+        try self.drain();
         self.need_prompt = true;
         self.dstk.top = 0;
         self.rstk.top = 0;
@@ -482,7 +489,21 @@ pub const VirtualStackMachine = struct {
         std.debug.print("machine reset\n", .{});
     }
 
+    pub fn loadWords(self: *VirtualStackMachine, file: []const u8) !void {
+        self.fd = try os.open(file, os.O.RDONLY, 0);
+        try self.run();
+        os.close(self.fd);
+        self.fd = 0;
+    }
+
     pub fn run(self: *VirtualStackMachine) !void {
+
+        self.need_prompt = true;
+        self.stop = false;
+        self.cptr = 0;
+        self.dstk.top = 0;
+        self.rstk.top = 0;
+        self.mode = .interpreting;
 
         while (false == self.stop) {
 
@@ -497,7 +518,7 @@ pub const VirtualStackMachine = struct {
             self.current_word.func(self) catch |err| {
                 //switch (err) {}
                 std.debug.print("{}\n", .{err});
-                try self.reset();
+                // try self.reset();
             };
         }
     }

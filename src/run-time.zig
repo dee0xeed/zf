@@ -27,12 +27,12 @@ pub fn returnImpl(vm: *VirtualStackMachine) !void {
 // DO I LOOP
 // https://stackoverflow.com/questions/6949434/how-to-implement-loop-in-a-forth-like-language-interpreter-written-in-c
 
-pub fn doImpl(vm: *VirtualStackMachine) !void {
-    const index = try vm.dstk.pop();
-    const limit = try vm.dstk.pop();
-    try vm.rstk.push(limit);
-    try vm.rstk.push(index);
-}
+//pub fn doImpl(vm: *VirtualStackMachine) !void {
+//    const index = try vm.dstk.pop();
+//    const limit = try vm.dstk.pop();
+//    try vm.rstk.push(limit);
+//    try vm.rstk.push(index);
+//}
 
 pub fn indexImpl(vm: *VirtualStackMachine) !void {
     const index = vm.rstk.mem[vm.rstk.top];
@@ -43,8 +43,8 @@ pub fn loopImpl(vm: *VirtualStackMachine) !void {
     vm.rstk.mem[vm.rstk.top] += 1;
     if (vm.rstk.mem[vm.rstk.top] == vm.rstk.mem[vm.rstk.top - 1]) {
         // end loop
-        _ = try vm.rstk.pop();
-        _ = try vm.rstk.pop();
+        _ = try vm.rstk.pop(); // R> drop
+        _ = try vm.rstk.pop(); // R> drop
         vm.cptr += 1;
     } else {
         // go to the beginning of the loop
@@ -73,6 +73,27 @@ pub fn swapImpl(vm: *VirtualStackMachine) !void {
     const b = try vm.dstk.pop();
     try vm.dstk.push(a);
     try vm.dstk.push(b);
+}
+
+pub fn rotImpl(vm: *VirtualStackMachine) !void {
+    const n3 = try vm.dstk.pop();
+    const n2 = try vm.dstk.pop();
+    const n1 = try vm.dstk.pop();
+    try vm.dstk.push(n2);
+    try vm.dstk.push(n3);
+    try vm.dstk.push(n1);
+}
+
+// >R
+pub fn pushImpl(vm: *VirtualStackMachine) !void {
+    const a = try vm.dstk.pop();
+    try vm.rstk.push(a);
+}
+
+// R>
+pub fn popImpl(vm: *VirtualStackMachine) !void {
+    const a = try vm.rstk.pop();
+    try vm.dstk.push(a);
 }
 
 pub fn andImpl(vm: *VirtualStackMachine) !void {

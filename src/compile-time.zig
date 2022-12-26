@@ -21,13 +21,14 @@ pub fn compElse(vm: *VirtualStackMachine) !void {
 }
 
 pub fn compThen(vm: *VirtualStackMachine) !void {
-    // resolve `jifz` (in if) or `jump` (in else) forward references
     const orig = try vm.dstk.pop();
+    // resolve `jifz` (in if) or `jump` (in else) forward reference
     vm.code[orig] = vm.cend;
 }
 
 pub fn compDo(vm: *VirtualStackMachine) !void {
-    const wn = vm.dict.getWordNumber("do-rt").?;
+    //const wn = vm.dict.getWordNumber("do-rt").?; // "native"
+    const wn = vm.dict.getWordNumber("do-impl").?; // "forth"
     try vm.appendText(wn, .word_number);
     try vm.dstk.push(vm.cend);
 }
@@ -41,6 +42,7 @@ pub fn compLoop(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("loop-rt").?;
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
+    // backward reference to begin
     try vm.appendText(bwref, .jump_location);
 }
 
@@ -52,6 +54,7 @@ pub fn compAgain(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("jump").?;
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
+    // backward reference to the beginning 
     try vm.appendText(bwref, .jump_location);
 }
 
@@ -59,6 +62,7 @@ pub fn compUntil(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("jifz").?;
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
+    // backward reference to the beginning
     try vm.appendText(bwref, .jump_location);
 }
 
