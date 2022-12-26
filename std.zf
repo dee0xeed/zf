@@ -1,1 +1,3 @@
 : do-impl R> rot rot swap >R >R >R ;
+: var create 1 allot ;
+: ? @ . cr ;
