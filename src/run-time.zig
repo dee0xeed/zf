@@ -24,11 +24,6 @@ pub fn returnImpl(vm: *VirtualStackMachine) !void {
     vm.cptr = try vm.rstk.pop();
 }
 
-//pub fn indexImpl(vm: *VirtualStackMachine) !void {
-//    const index = vm.rstk.mem[vm.rstk.top];
-//    try vm.dstk.push(index);
-//}
-
 pub fn loopImpl(vm: *VirtualStackMachine) !void {
     vm.rstk.mem[vm.rstk.top] += 1;
     if (vm.rstk.mem[vm.rstk.top] == vm.rstk.mem[vm.rstk.top - 1]) {
