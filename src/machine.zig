@@ -311,10 +311,11 @@ pub const VirtualStackMachine = struct {
 
     fn dumpData(self: *VirtualStackMachine) !void {
         var k: usize = 0;
-        var w: *Word = undefined;
         while (k < self.dend) : (k += 1) {
-            w = self.dict.findWordByDpos(k).?;
-            std.debug.print("data[{}] = 0x{x:0>16} ('{s}')\n", .{k, self.data[k], w.name});
+            var name: []const u8 = "-";
+            if (self.dict.findWordByDpos(k)) |w|
+                name = w.name;
+            std.debug.print("data[{}] = 0x{x:0>16} ('{s}')\n", .{k, self.data[k], name});
         }
     }
 
