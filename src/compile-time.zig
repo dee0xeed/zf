@@ -28,14 +28,14 @@ pub fn compThen(vm: *VirtualStackMachine) !void {
 
 pub fn compDo(vm: *VirtualStackMachine) !void {
     //const wn = vm.dict.getWordNumber("do-rt").?; // "native"
-    const wn = vm.dict.getWordNumber("do-impl").?; // "forth"
+    const wn = vm.dict.getWordNumber("iter-impl").?; // "forth"
     try vm.appendText(wn, .word_number);
     // 
     try vm.dstk.push(vm.cend);
 }
 
 pub fn compLoop(vm: *VirtualStackMachine) !void {
-    const wn = vm.dict.getWordNumber("loop-rt").?;
+    const wn = vm.dict.getWordNumber("loop").?;
     try vm.appendText(wn, .word_number);
     const bwref = try vm.dstk.pop();
     // backward reference to begin
@@ -63,7 +63,7 @@ pub fn compUntil(vm: *VirtualStackMachine) !void {
 }
 
 pub fn leaveCompileMode(vm: *VirtualStackMachine) !void {
-    const wn = vm.dict.getWordNumber("return").?;
+    const wn = vm.dict.getWordNumber("ret").?;
     try vm.appendText(wn, .word_number);
     vm.mode = .interpreting;
 }

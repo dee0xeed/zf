@@ -369,32 +369,31 @@ pub const VirtualStackMachine = struct {
         const builtins: []const Word = &[_]Word {
 
             // "instruction set"
-            .{.name = "jump",   .func = &rt.jumpImpl, .hidd = true},
-            .{.name = "jifz",   .func = &rt.jifzImpl, .hidd = true},
-            .{.name = "return", .func = &rt.returnImpl, .hidd = true},
-            .{.name = "lit",    .func = &rt.litImpl,  .hidd = true},
-            .{.name = "loop-rt", .func = &rt.loopImpl, .hidd = true}, // ...
-            .{.name = "dup",   .func = &rt.dupImpl},
-            .{.name = "drop",  .func = &rt.dropImpl},
-            .{.name = "swap",  .func = &rt.swapImpl},
-            .{.name = "rot",   .func = &rt.rotImpl},
-            .{.name = ">r",    .func = &rt.pushImpl},
-            .{.name = "r>",    .func = &rt.popImpl},
-            .{.name = "and",   .func = &rt.andImpl},
-            .{.name = "or",    .func = &rt.orImpl},
-            .{.name = "xor",   .func = &rt.xorImpl},
-            .{.name = "inv",   .func = &rt.invertImpl},
-            .{.name = "+",     .func = &rt.addImpl},
-            .{.name = "-",     .func = &rt.subImpl},
-            .{.name = "*",     .func = &rt.mulImpl},
-            .{.name = "/",     .func = &rt.divImpl},
-            .{.name = "mod",   .func = &rt.modImpl},
-            .{.name = "=",     .func = &rt.eqlImpl},
-            .{.name = "<>",    .func = &rt.neqImpl},
-            .{.name = ">",     .func = &rt.gtImpl},
-            .{.name = "<",     .func = &rt.ltImpl},
-            .{.name = "!",     .func = &rt.storeImpl},
-            .{.name = "@",     .func = &rt.fetchImpl},
+            .{.name = "jump", .func = &rt.jumpImpl, .hidd = true},
+            .{.name = "jifz", .func = &rt.jifzImpl, .hidd = true},
+            .{.name = "ret",  .func = &rt.returnImpl, .hidd = true},
+            .{.name = "lit",  .func = &rt.litImpl,  .hidd = true},
+            .{.name = "loop", .func = &rt.loopImpl, .hidd = true},
+            .{.name = "dup",  .func = &rt.dupImpl},
+            .{.name = "drop", .func = &rt.dropImpl},
+            .{.name = "swap", .func = &rt.swapImpl},
+            .{.name = ">r",   .func = &rt.pushImpl},
+            .{.name = "r>",   .func = &rt.popImpl},
+            .{.name = "and",  .func = &rt.andImpl},
+            .{.name = "or",   .func = &rt.orImpl},
+            .{.name = "xor",  .func = &rt.xorImpl},
+            .{.name = "inv",  .func = &rt.invertImpl},
+            .{.name = "+",    .func = &rt.addImpl},
+            .{.name = "-",    .func = &rt.subImpl},
+            .{.name = "*",    .func = &rt.mulImpl},
+            .{.name = "/",    .func = &rt.divImpl},
+            .{.name = "mod",  .func = &rt.modImpl},
+            .{.name = "=",    .func = &rt.eqlImpl},
+            .{.name = "<>",   .func = &rt.neqImpl},
+            .{.name = ">",    .func = &rt.gtImpl},
+            .{.name = "<",    .func = &rt.ltImpl},
+            .{.name = "!",    .func = &rt.storeImpl},
+            .{.name = "@",    .func = &rt.fetchImpl},
 
             // shell
             .{.name = "prom",  .func = &promImpl, .hidd = true},
@@ -409,7 +408,7 @@ pub const VirtualStackMachine = struct {
             .{.name = ".text", .func = &dumpCode},
             .{.name = ".data", .func = &dumpData},
 
-            // ???
+            // ??? memory management ???
             .{.name = "allot", .func = &rt.allotImpl},
 
             // defining words
@@ -422,12 +421,9 @@ pub const VirtualStackMachine = struct {
             .{.name = "if",   .func = &ct.compIf, .comp = true},
             .{.name = "else", .func = &ct.compElse, .comp = true},
             .{.name = "then", .func = &ct.compThen, .comp = true},
-            .{.name = "do",   .func = &ct.compDo, .comp = true},
-            .{.name = "iter",   .func = &ct.compDo, .comp = true},
+            .{.name = "iter",   .func = &ct.compDo, .comp = true}, // do
 //            .{.name = "break", .func = &ct.breakImpl, .comp = true},
-//            .{.name = "leave", .func = &ct.breakImpl, .comp = true},
-            .{.name = "loop", .func = &ct.compLoop, .comp = true},
-            .{.name = "next", .func = &ct.compLoop, .comp = true},
+            .{.name = "next", .func = &ct.compLoop, .comp = true}, // loop
             .{.name = "begin", .func = &ct.compBegin, .comp = true},
             .{.name = "again", .func = &ct.compAgain, .comp = true},
             .{.name = "until", .func = &ct.compUntil, .comp = true},

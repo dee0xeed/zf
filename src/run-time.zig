@@ -28,8 +28,8 @@ pub fn loopImpl(vm: *VirtualStackMachine) !void {
     vm.rstk.mem[vm.rstk.top] += 1;
     if (vm.rstk.mem[vm.rstk.top] == vm.rstk.mem[vm.rstk.top - 1]) {
         // end loop
-        _ = try vm.rstk.pop(); // R> drop
-        _ = try vm.rstk.pop(); // R> drop
+        _ = try vm.rstk.pop();
+        _ = try vm.rstk.pop();
         vm.cptr += 1;
     } else {
         // go to the beginning of the loop
@@ -58,15 +58,6 @@ pub fn swapImpl(vm: *VirtualStackMachine) !void {
     const b = try vm.dstk.pop();
     try vm.dstk.push(a);
     try vm.dstk.push(b);
-}
-
-pub fn rotImpl(vm: *VirtualStackMachine) !void {
-    const n3 = try vm.dstk.pop();
-    const n2 = try vm.dstk.pop();
-    const n1 = try vm.dstk.pop();
-    try vm.dstk.push(n2);
-    try vm.dstk.push(n3);
-    try vm.dstk.push(n1);
 }
 
 // >R
