@@ -183,3 +183,22 @@ text[0014] = 000000000000000c `.`
 text[0015] = 000000000000000d `cr`
 text[0016] = 0000000000000006 `return`
 ```
+
+## ... `does>`
+
+```
+zf> : self-incrementing-var create 1 allot does> dup @ 1+ swap ! ;
+zf> 
+zf> self-incrementing-var i1
+zf> self-incrementing-var i2
+zf> .data
+...
+data[2] = 0x0000000000000000 ('i1')
+data[3] = 0x0000000000000000 ('i2')
+zf> i1 i1 i1 i1 i1 i1 
+zf> i2
+zf> .data
+...
+data[2] = 0x0000000000000006 ('i1')
+data[3] = 0x0000000000000001 ('i2')
+```

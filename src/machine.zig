@@ -11,11 +11,11 @@ pub const Word = struct {
     const MAX_WORD_LEN = 64;
     buff: [MAX_WORD_LEN]u8 = undefined,
     name: []const u8,
-    func: wordFnPtr,
-    cpos: ?usize = null,  // location in the code, null for builtins
-    hidd: bool = false,   // is hidden (not intended to use directly)
-    comp: bool = false,   // compile time only, "compiling word"
-    dpos: ?usize = null,  // for variables, location in the data segment
+    func: wordFnPtr,        // implementation
+    cpos: ?usize = null,    // location in the code segment, null for builtins
+    hidd: bool = false,     // is hidden (not intended to be used directly)
+    comp: bool = false,     // compile time only, "compiling word"
+    dpos: ?usize = null,    // for variables, location in the data segment
 };
 
 pub const Dict = struct {
@@ -358,6 +358,25 @@ pub const VirtualStackMachine = struct {
         _ = try self.dict.addWord(word);
     }
 
+//https://softwareengineering.stackexchange.com/questions/339283/forth-how-do-create-and-does-work-exactly
+
+    // 'DOES>'
+    fn compDoes(self: *VirtualStackMachine) !void {
+        var wn = self.dict.getWordNumber("does").?;
+        try self.appendText(wn, .word_number);
+        wn = self.dict.getWordNumber("ret").?;
+        try self.appendText(wn, .word_number);
+    }
+
+    fn execDoes(self: *VirtualStackMachine) !void {
+        // adding a word with that new defining word
+        var w = &self.dict.words[self.dict.nwords];
+        // last word (i.e. the one being added now)
+        w.func = rt.addrCallImpl; // :)
+        w.cpos = self.cptr + 1;
+        // right after the 'does, ret'
+    }
+
     pub fn init() !VirtualStackMachine {
 
         var vm = VirtualStackMachine {
@@ -371,7 +390,7 @@ pub const VirtualStackMachine = struct {
             // "instruction set"
             .{.name = "jump", .func = &rt.jumpImpl, .hidd = true},
             .{.name = "jifz", .func = &rt.jifzImpl, .hidd = true},
-            .{.name = "ret",  .func = &rt.returnImpl, .hidd = true},
+            .{.name = "ret",  .func = &rt.retImpl, .hidd = true},
             .{.name = "lit",  .func = &rt.litImpl,  .hidd = true},
             .{.name = "loop", .func = &rt.loopImpl, .hidd = true},
             .{.name = "dup",  .func = &rt.dupImpl},
@@ -410,9 +429,12 @@ pub const VirtualStackMachine = struct {
 
             // ??? memory management ???
             .{.name = "allot", .func = &rt.allotImpl},
+            // .{.name = ",", .func = &rt.allotImpl},
 
-            // defining words
+            // defining words (dictionary management)
             .{.name = "create", .func = &makeAddrWord},
+            .{.name = "does>", .func = &compDoes, .comp = true},
+            .{.name = "does", .func = &execDoes},
             .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "val", .func = &},
 

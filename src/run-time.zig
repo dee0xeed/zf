@@ -20,7 +20,7 @@ pub fn callImpl(vm: *VirtualStackMachine) !void {
     vm.cptr = vm.current_word.cpos.?;
 }
 
-pub fn returnImpl(vm: *VirtualStackMachine) !void {
+pub fn retImpl(vm: *VirtualStackMachine) !void {
     vm.cptr = try vm.rstk.pop();
 }
 
@@ -164,6 +164,11 @@ pub fn ltImpl(vm: *VirtualStackMachine) !void {
 pub fn addrImpl(vm: *VirtualStackMachine) !void {
     const addr = vm.current_word.dpos.?;
     try vm.dstk.push(addr);
+}
+
+pub fn addrCallImpl(vm: *VirtualStackMachine) !void {
+    try addrImpl(vm);
+    try callImpl(vm);
 }
 
 pub fn fetchImpl(vm: *VirtualStackMachine) !void {
