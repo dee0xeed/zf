@@ -5,6 +5,7 @@ const mem = std.mem;
 const Stack = @import("stack.zig").Stack;
 const ct = @import("compile-time.zig");
 const rt = @import("run-time.zig");
+const mm = @import("memory.zig");
 const wordFnPtr = *const fn(*VirtualStackMachine) anyerror!void;
 
 pub const Word = struct {
@@ -409,9 +410,9 @@ pub const VirtualStackMachine = struct {
             .{.name = ".data", .func = &dumpData},
 
             // ??? memory management ???
-            .{.name = "allot", .func = &rt.allotImpl},
-            // .{.name = ",", .func = &rt.allotImpl},
             // here...
+            .{.name = "allot", .func = &mm.allotImpl},
+            // .{.name = ",", .func = &rt.Impl},
 
             // defining words (dictionary management)
             .{.name = "create", .func = &makeAddrWord},

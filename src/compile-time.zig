@@ -83,6 +83,7 @@ pub fn compRet(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("ret").?;
     try vm.appendText(wn, .word_number);
     vm.mode = .interpreting;
+    std.debug.print("word '{s}' added\n", .{vm.dict.words[vm.dict.nwords].name});
 }
 
 pub fn compComment(vm: *VirtualStackMachine) !void {
