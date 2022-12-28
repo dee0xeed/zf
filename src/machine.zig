@@ -334,7 +334,7 @@ pub const VirtualStackMachine = struct {
 
         const word = Word {
             .name = name,
-            .func = rt.callImpl,
+            .func = rt.cmdCall,
             .cpos = self.cend,
             .hidd = false,
             .comp = false,
@@ -349,7 +349,7 @@ pub const VirtualStackMachine = struct {
         const name = self.ibuf[0..self.bcnt];
         const word = Word {
             .name = name,
-            .func = rt.addrImpl,
+            .func = rt.cmdAddr,
             .cpos = self.cend,
             .hidd = false,
             .comp = false,
@@ -358,19 +358,11 @@ pub const VirtualStackMachine = struct {
         _ = try self.dict.addWord(word);
     }
 
-    // 'DOES>'
-    fn compDoes(self: *VirtualStackMachine) !void {
-        var wn = self.dict.getWordNumber("does").?;
-        try self.appendText(wn, .word_number);
-        wn = self.dict.getWordNumber("ret").?;
-        try self.appendText(wn, .word_number);
-    }
-
     fn execDoes(self: *VirtualStackMachine) !void {
         // adding a word with that new defining word
         var w = &self.dict.words[self.dict.nwords];
         // last word (i.e. the one being added now)
-        w.func = rt.addrCallImpl; // :)
+        w.func = rt.cmdAddrCall; // :)
         w.cpos = self.cptr + 1;
         // right after the 'does, ret'
     }
@@ -386,31 +378,31 @@ pub const VirtualStackMachine = struct {
         const builtins: []const Word = &[_]Word {
 
             // "instruction set"
-            .{.name = "jump", .func = &rt.jumpImpl, .hidd = true},
-            .{.name = "jifz", .func = &rt.jifzImpl, .hidd = true},
-            .{.name = "ret",  .func = &rt.retImpl, .hidd = true},
-            .{.name = "lit",  .func = &rt.litImpl,  .hidd = true},
-            .{.name = "loop", .func = &rt.loopImpl, .hidd = true},
-            .{.name = "dup",  .func = &rt.dupImpl},
-            .{.name = "drop", .func = &rt.dropImpl},
-            .{.name = "swap", .func = &rt.swapImpl},
-            .{.name = ">r",   .func = &rt.pushImpl},
-            .{.name = "r>",   .func = &rt.popImpl},
-            .{.name = "and",  .func = &rt.andImpl},
-            .{.name = "or",   .func = &rt.orImpl},
-            .{.name = "xor",  .func = &rt.xorImpl},
-            .{.name = "inv",  .func = &rt.invertImpl},
-            .{.name = "+",    .func = &rt.addImpl},
-            .{.name = "-",    .func = &rt.subImpl},
-            .{.name = "*",    .func = &rt.mulImpl},
-            .{.name = "/",    .func = &rt.divImpl},
-            .{.name = "mod",  .func = &rt.modImpl},
-            .{.name = "=",    .func = &rt.eqlImpl},
-            .{.name = "<>",   .func = &rt.neqImpl},
-            .{.name = ">",    .func = &rt.gtImpl},
-            .{.name = "<",    .func = &rt.ltImpl},
-            .{.name = "!",    .func = &rt.storeImpl},
-            .{.name = "@",    .func = &rt.fetchImpl},
+            .{.name = "jump", .func = &rt.cmdJump, .hidd = true},
+            .{.name = "jifz", .func = &rt.cmdJifz, .hidd = true},
+            .{.name = "ret",  .func = &rt.cmdRet, .hidd = true},
+            .{.name = "loop", .func = &rt.cmdLoop, .hidd = true},
+            .{.name = "lit",  .func = &rt.cmdLit,  .hidd = true},
+            .{.name = "dup",  .func = &rt.cmdDup},
+            .{.name = "drop", .func = &rt.cmdDrop},
+            .{.name = "swap", .func = &rt.cmdSwap},
+            .{.name = ">r",   .func = &rt.cmdPush},
+            .{.name = "r>",   .func = &rt.cmdPop},
+            .{.name = "and",  .func = &rt.cmdAnd},
+            .{.name = "or",   .func = &rt.cmdOr},
+            .{.name = "xor",  .func = &rt.cmdXor},
+            .{.name = "inv",  .func = &rt.cmdInv},
+            .{.name = "+",    .func = &rt.cmdAdd},
+            .{.name = "-",    .func = &rt.cmdSub},
+            .{.name = "*",    .func = &rt.cmdMul},
+            .{.name = "/",    .func = &rt.cmdDiv},
+            .{.name = "mod",  .func = &rt.cmdMod},
+            .{.name = "=",    .func = &rt.cmdEql},
+            .{.name = "<>",   .func = &rt.cmdNeq},
+            .{.name = ">",    .func = &rt.cmdGt},
+            .{.name = "<",    .func = &rt.cmdLt},
+            .{.name = "!",    .func = &rt.cmdStore},
+            .{.name = "@",    .func = &rt.cmdFetch},
 
             // shell
             .{.name = "prom",  .func = &promImpl, .hidd = true},
@@ -428,16 +420,17 @@ pub const VirtualStackMachine = struct {
             // ??? memory management ???
             .{.name = "allot", .func = &rt.allotImpl},
             // .{.name = ",", .func = &rt.allotImpl},
+            // here...
 
             // defining words (dictionary management)
             .{.name = "create", .func = &makeAddrWord},
-            .{.name = "does>", .func = &compDoes, .comp = true},
+            .{.name = "does>", .func = &ct.compDoes, .comp = true},
             .{.name = "does", .func = &execDoes},
             .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "val", .func = &},
 
             // compiling words
-            .{.name = ";",    .func = &ct.leaveCompileMode, .comp = true},
+            .{.name = ";",    .func = &ct.compRet, .comp = true},
             .{.name = "if",   .func = &ct.compIf, .comp = true},
             .{.name = "else", .func = &ct.compElse, .comp = true},
             .{.name = "then", .func = &ct.compThen, .comp = true},
@@ -447,7 +440,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "begin", .func = &ct.compBegin, .comp = true},
             .{.name = "again", .func = &ct.compAgain, .comp = true},
             .{.name = "until", .func = &ct.compUntil, .comp = true},
-            .{.name = "(",  .func = &ct.commentImpl, .comp = true},
+            .{.name = "(",  .func = &ct.compComment, .comp = true},
         };
 
         for (builtins) |w|

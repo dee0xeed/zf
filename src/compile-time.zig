@@ -62,13 +62,20 @@ pub fn compUntil(vm: *VirtualStackMachine) !void {
     try vm.appendText(bwref, .jump_location);
 }
 
-pub fn leaveCompileMode(vm: *VirtualStackMachine) !void {
+pub fn compDoes(self: *VirtualStackMachine) !void {
+    var wn = self.dict.getWordNumber("does").?;
+    try self.appendText(wn, .word_number);
+    wn = self.dict.getWordNumber("ret").?;
+    try self.appendText(wn, .word_number);
+}
+
+pub fn compRet(vm: *VirtualStackMachine) !void {
     const wn = vm.dict.getWordNumber("ret").?;
     try vm.appendText(wn, .word_number);
     vm.mode = .interpreting;
 }
 
-pub fn commentImpl(vm: *VirtualStackMachine) !void {
+pub fn compComment(vm: *VirtualStackMachine) !void {
     _ = vm;
     while (true) {
         var b: [1]u8 = undefined;

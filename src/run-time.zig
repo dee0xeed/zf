@@ -2,11 +2,11 @@
 const std = @import("std");
 const VirtualStackMachine = @import("machine.zig").VirtualStackMachine;
 
-pub fn jumpImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdJump(vm: *VirtualStackMachine) !void {
     vm.cptr = vm.code[vm.cptr];
 }
 
-pub fn jifzImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdJifz(vm: *VirtualStackMachine) !void {
     const tods = try vm.dstk.pop();
     if (0 == tods) {
         vm.cptr = vm.code[vm.cptr];
@@ -15,16 +15,16 @@ pub fn jifzImpl(vm: *VirtualStackMachine) !void {
     }
 }
 
-pub fn callImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdCall(vm: *VirtualStackMachine) !void {
     try vm.rstk.push(vm.cptr);
     vm.cptr = vm.current_word.cpos.?;
 }
 
-pub fn retImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdRet(vm: *VirtualStackMachine) !void {
     vm.cptr = try vm.rstk.pop();
 }
 
-pub fn loopImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdLoop(vm: *VirtualStackMachine) !void {
     vm.rstk.mem[vm.rstk.top] += 1;
     if (vm.rstk.mem[vm.rstk.top] == vm.rstk.mem[vm.rstk.top - 1]) {
         // end loop
@@ -37,23 +37,23 @@ pub fn loopImpl(vm: *VirtualStackMachine) !void {
     }
 }
 
-pub fn litImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdLit(vm: *VirtualStackMachine) !void {
     const code = vm.code[vm.cptr];
     try vm.dstk.push(code);
     vm.cptr += 1; // step over the literal
 }
 
-pub fn dupImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdDup(vm: *VirtualStackMachine) !void {
     const x = try vm.dstk.pop();
     try vm.dstk.push(x);
     try vm.dstk.push(x);
 }
 
-pub fn dropImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdDrop(vm: *VirtualStackMachine) !void {
     _ = try vm.dstk.pop();
 }
 
-pub fn swapImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdSwap(vm: *VirtualStackMachine) !void {
     const a = try vm.dstk.pop();
     const b = try vm.dstk.pop();
     try vm.dstk.push(a);
@@ -61,123 +61,123 @@ pub fn swapImpl(vm: *VirtualStackMachine) !void {
 }
 
 // >R
-pub fn pushImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdPush(vm: *VirtualStackMachine) !void {
     const a = try vm.dstk.pop();
     try vm.rstk.push(a);
 }
 
 // R>
-pub fn popImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdPop(vm: *VirtualStackMachine) !void {
     const a = try vm.rstk.pop();
     try vm.dstk.push(a);
 }
 
-pub fn andImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdAnd(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = lhs & rhs;
     try vm.dstk.push(res);
 }
 
-pub fn orImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdOr(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = lhs | rhs;
     try vm.dstk.push(res);
 }
 
-pub fn xorImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdXor(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = lhs ^ rhs;
     try vm.dstk.push(res);
 }
 
-pub fn invertImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdInv(vm: *VirtualStackMachine) !void {
     const n = try vm.dstk.pop();
     try vm.dstk.push(~n);
 }
 
-pub fn addImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdAdd(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) + @bitCast(isize, rhs);
     try vm.dstk.push(@bitCast(usize, res));
 }
 
-pub fn subImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdSub(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) - @bitCast(isize, rhs);
     try vm.dstk.push(@bitCast(usize, res));
 }
 
-pub fn mulImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdMul(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) * @bitCast(isize, rhs);
     try vm.dstk.push(@bitCast(usize, res));
 }
 
-pub fn divImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdDiv(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @divTrunc(@bitCast(isize, lhs), @bitCast(isize, rhs));
     try vm.dstk.push(@bitCast(usize, res));
 }
 
-pub fn modImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdMod(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @mod(@bitCast(isize, lhs), @bitCast(isize, rhs));
     try vm.dstk.push(@bitCast(usize, res));
 }
 
-pub fn eqlImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdEql(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res: bool = (lhs == rhs);
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn neqImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdNeq(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res: bool = (lhs != rhs);
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn gtImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdGt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) > @bitCast(isize, rhs);
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn ltImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdLt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) < @bitCast(isize, rhs);
     try vm.dstk.push(@boolToInt(res));
 }
 
-pub fn addrImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdAddr(vm: *VirtualStackMachine) !void {
     const addr = vm.current_word.dpos.?;
     try vm.dstk.push(addr);
 }
 
-pub fn addrCallImpl(vm: *VirtualStackMachine) !void {
-    try addrImpl(vm);
-    try callImpl(vm);
+pub fn cmdAddrCall(vm: *VirtualStackMachine) !void {
+    try cmdAddr(vm);
+    try cmdCall(vm);
 }
 
-pub fn fetchImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdFetch(vm: *VirtualStackMachine) !void {
     const addr = try vm.dstk.pop();
     const numb = vm.data[addr];
     try vm.dstk.push(numb);
 }
 
-pub fn storeImpl(vm: *VirtualStackMachine) !void {
+pub fn cmdStore(vm: *VirtualStackMachine) !void {
     const addr = try vm.dstk.pop();
     const numb = try vm.dstk.pop();
     vm.data[addr] = numb;
