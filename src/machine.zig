@@ -21,7 +21,7 @@ pub const Word = struct {
 
 pub const Dict = struct {
 
-    const cap: usize = 256;
+    const cap: usize = 1024;
     const Error = error {
         DictionaryIsFull,
     };
@@ -76,8 +76,8 @@ pub const Dict = struct {
 
 pub const VirtualStackMachine = struct {
 
-    const CODE_CAP = 2048;
-    const DATA_CAP = 2048;
+    const CODE_CAP = 32384;
+    const DATA_CAP = 32384;
 
     const Error = error {
         WordNumberOutOfRange,
@@ -131,7 +131,8 @@ pub const VirtualStackMachine = struct {
     fn promImpl(self: *VirtualStackMachine) !void {
         if (self.need_prompt) {
             if (.compiling == self.mode) {
-                _ = try os.write(1, "zf(c)> ");
+                if (0 == self.fd)
+                    _ = try os.write(1, "zf(c)> ");
             } else {
                 _ = try os.write(1, "zf> ");
             }
