@@ -144,6 +144,9 @@ cr x ?
 * [Open FirmWare/Forth Lessons](https://wiki.laptop.org/go/Forth_Lessons)
 * [Implementing a FORTH virtual machine](http://www.w3group.de/forth_course.html)
 * [MuP21 instruction set](https://groups.google.com/g/comp.lang.forth/c/7UULcFs7kas)
+* [do-loop](https://stackoverflow.com/questions/6949434/how-to-implement-loop-in-a-forth-like-language-interpreter-written-in-c)
+* [do-leave-loop](https://stackoverflow.com/questions/58304029/how-is-forth-leave-loop-implemented-since-number-of-leaves-is-not-known-bef)
+* [create-does](//https://softwareengineering.stackexchange.com/questions/339283/forth-how-do-create-and-does-work-exactly)
 
 ## ...
 

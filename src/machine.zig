@@ -358,8 +358,6 @@ pub const VirtualStackMachine = struct {
         _ = try self.dict.addWord(word);
     }
 
-//https://softwareengineering.stackexchange.com/questions/339283/forth-how-do-create-and-does-work-exactly
-
     // 'DOES>'
     fn compDoes(self: *VirtualStackMachine) !void {
         var wn = self.dict.getWordNumber("does").?;
