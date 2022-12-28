@@ -6,6 +6,7 @@ pub fn main() !void {
 
     var vm = try Machine.init();
     try vm.loadWords("std.zf");
+    std.debug.print("--- type 'bye' to quit (or press ^D)\n", .{});
     vm.run() catch |err| {
         std.debug.print("{}\n", .{err});
     };

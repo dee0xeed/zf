@@ -63,6 +63,7 @@ pub fn compUntil(vm: *VirtualStackMachine) !void {
     try vm.appendText(bwref, .jump_location);
 }
 
+// adding new defining word
 pub fn compDoes(self: *VirtualStackMachine) !void {
     var wn = self.dict.getWordNumber("does").?;
     try self.appendText(wn, .word_number);
@@ -70,13 +71,13 @@ pub fn compDoes(self: *VirtualStackMachine) !void {
     try self.appendText(wn, .word_number);
 }
 
+// adding a word (variable) with that new defining word
 pub fn execDoes(self: *VirtualStackMachine) !void {
-    // adding a word with that new defining word
-    var w = &self.dict.words[self.dict.nwords];
     // last word (i.e. the one being added now)
+    var w = &self.dict.words[self.dict.nwords];
     w.func = rt.cmdAddrCall; // :)
-    w.cpos = self.cptr + 1;
     // right after the 'does, ret'
+    w.cpos = self.cptr + 1;
 }
 
 pub fn compRet(vm: *VirtualStackMachine) !void {
@@ -84,7 +85,7 @@ pub fn compRet(vm: *VirtualStackMachine) !void {
     try vm.appendText(wn, .word_number);
     vm.mode = .interpreting;
     const w = &vm.dict.words[vm.dict.nwords];
-    std.debug.print("word {s: >10} compiled @ 0x{x:0>4}\n", .{w.name, w.cpos.?});
+    std.debug.print("word {s: ^11} compiled @ 0x{x:0>4}\n", .{w.name, w.cpos.?});
 }
 
 pub fn compComment(vm: *VirtualStackMachine) !void {

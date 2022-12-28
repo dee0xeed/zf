@@ -331,7 +331,7 @@ pub const VirtualStackMachine = struct {
             mem.eql(u8, name, "(") or
             mem.eql(u8, name, ")")
         ) {
-            std.debug.print("word can not be named '{s}'\n", .{name});
+            std.debug.print("a word can not be named '{s}'\n", .{name});
             return Error.IllegalWordName;
         }
         // check for a number also...
@@ -477,6 +477,7 @@ pub const VirtualStackMachine = struct {
     }
 
     pub fn loadWords(self: *VirtualStackMachine, file: []const u8) !void {
+        std.debug.print("loading words from {s}...\n", .{file});
         self.fd = try os.open(file, os.O.RDONLY, 0);
         try self.run();
         os.close(self.fd);
