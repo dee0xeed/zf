@@ -200,7 +200,7 @@ pub const VirtualStackMachine = struct {
         // string? TODO...
         // if ('"' == ) {}
         // const name = self.ibuf[0..self.bcnt];
-        // std.debug.print("compiling '{s}'\n", .{name});
+        //std.debug.print("compiling '{s}'\n", .{name});
 
         if (mem.eql(u8, name, ":")) {
             std.debug.print("'{s}' inside word definition\n", .{name});
@@ -262,6 +262,7 @@ pub const VirtualStackMachine = struct {
             return;
 
         const name = self.ibuf[0..self.bcnt];
+        // std.debug.print("processing '{s}'\n", .{name});
 
         if (.compiling == self.mode) {
             try self.compile(name);

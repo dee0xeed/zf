@@ -87,10 +87,9 @@ pub fn compRet(vm: *VirtualStackMachine) !void {
 }
 
 pub fn compComment(vm: *VirtualStackMachine) !void {
-    _ = vm;
     while (true) {
         var b: [1]u8 = undefined;
-        _ = try std.os.read(0, b[0..]);
+        _ = try std.os.read(vm.fd, b[0..]);
         if (std.mem.eql(u8, b[0..], ")"))
             break;
     }

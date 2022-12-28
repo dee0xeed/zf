@@ -1,5 +1,7 @@
 : 1+ 1 + ;
 : 1- 1 - ;
+: 2* 2 * ;
+: 2/ 2 / ;
 : 0= 0 = ;
 : 0<> 0 <> ;
 : 0> 0 > ;
@@ -16,3 +18,18 @@
 : iter-impl r> rot rot swap >r >r >r ;
 : i r> r> dup >r swap >r ;
 : , here 1 allot ! ;
+: array ( n -- )
+    create dup , allot
+    does>
+        over 1
+        < if
+            drop drop
+        else
+            2dup @
+            > if
+                drop drop
+            else
+                over + swap drop
+            then
+        then
+;
