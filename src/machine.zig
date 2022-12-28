@@ -181,7 +181,8 @@ pub const VirtualStackMachine = struct {
             _ = os.linux.ioctl(0, os.linux.T.FIONREAD, @ptrToInt(&n));
             if (0 == n) break;
             _ = try os.read(self.fd, b[0..]);
-            _ = try os.write(1, b[0..]);
+            if (b[0] != 0x0A)
+                _ = try os.write(1, b[0..]);
         }
         std.debug.print("'\n", .{});
     }
@@ -409,9 +410,9 @@ pub const VirtualStackMachine = struct {
             .{.name = ".text", .func = &dumpCode},
             .{.name = ".data", .func = &dumpData},
 
-            // ??? memory management ???
-            // here...
-            .{.name = "allot", .func = &mm.allotImpl},
+            // memory management (data segment)
+            .{.name = "here",  .func = &mm.here},
+            .{.name = "allot", .func = &mm.allot},
             // .{.name = ",", .func = &rt.Impl},
 
             // defining words (dictionary management)
@@ -492,6 +493,7 @@ pub const VirtualStackMachine = struct {
         while (false == self.stop) {
 
             var wnum = self.code[self.cptr];
+
             if ((0 == wnum) or (wnum > self.dict.nwords)) {
                 std.debug.print("wnum = 0x{x:0>16}\n", .{wnum});
                 return Error.WordNumberOutOfRange;
@@ -501,7 +503,14 @@ pub const VirtualStackMachine = struct {
             self.cptr += 1;
             self.current_word.func(self) catch |err| {
                 try self.drain();
-                return err;
+                if (.interpreting == self.mode) {
+                    self.dstk.top = 0;
+                    self.rstk.top = 0;
+                    std.debug.print("{}\n", .{err});
+                    self.need_prompt = true;
+                } else {
+                    return err;
+                }
             };
         }
     }
