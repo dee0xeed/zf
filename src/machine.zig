@@ -380,29 +380,29 @@ pub const VirtualStackMachine = struct {
             // "instruction set"
             .{.name = "jump", .func = &rt.cmdJump, .hidd = true},
             .{.name = "jifz", .func = &rt.cmdJifz, .hidd = true},
-            .{.name = "ret",  .func = &rt.cmdRet, .hidd = true},
+            .{.name = "ret",  .func = &rt.cmdRet,  .hidd = true},
             .{.name = "loop", .func = &rt.cmdLoop, .hidd = true},
             .{.name = "lit",  .func = &rt.cmdLit,  .hidd = true},
-            .{.name = "dup",  .func = &rt.cmdDup},
-            .{.name = "drop", .func = &rt.cmdDrop},
-            .{.name = "swap", .func = &rt.cmdSwap},
-            .{.name = ">r",   .func = &rt.cmdPush},
-            .{.name = "r>",   .func = &rt.cmdPop},
-            .{.name = "and",  .func = &rt.cmdAnd},
-            .{.name = "or",   .func = &rt.cmdOr},
-            .{.name = "xor",  .func = &rt.cmdXor},
-            .{.name = "inv",  .func = &rt.cmdInv},
-            .{.name = "+",    .func = &rt.cmdAdd},
-            .{.name = "-",    .func = &rt.cmdSub},
-            .{.name = "*",    .func = &rt.cmdMul},
-            .{.name = "/",    .func = &rt.cmdDiv},
-            .{.name = "mod",  .func = &rt.cmdMod},
-            .{.name = "=",    .func = &rt.cmdEql},
-            .{.name = "<>",   .func = &rt.cmdNeq},
-            .{.name = ">",    .func = &rt.cmdGt},
-            .{.name = "<",    .func = &rt.cmdLt},
-            .{.name = "!",    .func = &rt.cmdStore},
-            .{.name = "@",    .func = &rt.cmdFetch},
+            .{.name = "dup",  .func = &rt.cmdDup               },
+            .{.name = "drop", .func = &rt.cmdDrop              },
+            .{.name = "swap", .func = &rt.cmdSwap              },
+            .{.name = ">r",   .func = &rt.cmdPush              },
+            .{.name = "r>",   .func = &rt.cmdPop               },
+            .{.name = "and",  .func = &rt.cmdAnd               },
+            .{.name = "or",   .func = &rt.cmdOr                },
+            .{.name = "xor",  .func = &rt.cmdXor               },
+            .{.name = "inv",  .func = &rt.cmdInv               },
+            .{.name = "+",    .func = &rt.cmdAdd               },
+            .{.name = "-",    .func = &rt.cmdSub               },
+            .{.name = "*",    .func = &rt.cmdMul               },
+            .{.name = "/",    .func = &rt.cmdDiv               },
+            .{.name = "mod",  .func = &rt.cmdMod               },
+            .{.name = "=",    .func = &rt.cmdEql               },
+            .{.name = "<>",   .func = &rt.cmdNeq               },
+            .{.name = ">",    .func = &rt.cmdGt                },
+            .{.name = "<",    .func = &rt.cmdLt                },
+            .{.name = "!",    .func = &rt.cmdStore             },
+            .{.name = "@",    .func = &rt.cmdFetch             },
 
             // shell
             .{.name = "prom",  .func = &promImpl, .hidd = true},
@@ -430,13 +430,13 @@ pub const VirtualStackMachine = struct {
 //            .{.name = "val", .func = &},
 
             // compiling words
-            .{.name = ";",    .func = &ct.compRet, .comp = true},
-            .{.name = "if",   .func = &ct.compIf, .comp = true},
-            .{.name = "else", .func = &ct.compElse, .comp = true},
-            .{.name = "then", .func = &ct.compThen, .comp = true},
-            .{.name = "iter",   .func = &ct.compDo, .comp = true}, // do
+            .{.name = ";",     .func = &ct.compRet, .comp = true},
+            .{.name = "if",    .func = &ct.compIf, .comp = true},
+            .{.name = "else",  .func = &ct.compElse, .comp = true},
+            .{.name = "then",  .func = &ct.compThen, .comp = true},
+            .{.name = "iter",  .func = &ct.compDo, .comp = true}, // do
 //            .{.name = "break", .func = &ct.breakImpl, .comp = true},
-            .{.name = "next", .func = &ct.compLoop, .comp = true}, // loop
+            .{.name = "next",  .func = &ct.compLoop, .comp = true}, // loop
             .{.name = "begin", .func = &ct.compBegin, .comp = true},
             .{.name = "again", .func = &ct.compAgain, .comp = true},
             .{.name = "until", .func = &ct.compUntil, .comp = true},
@@ -508,9 +508,8 @@ pub const VirtualStackMachine = struct {
             self.current_word = &self.dict.words[wnum];
             self.cptr += 1;
             self.current_word.func(self) catch |err| {
-                //switch (err) {}
-                std.debug.print("{}\n", .{err});
-                // try self.reset();
+                try self.drain();
+                return err;
             };
         }
     }
