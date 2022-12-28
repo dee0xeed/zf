@@ -161,13 +161,13 @@ pub fn cmdLt(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(@boolToInt(res));
 }
 
-// for 'simple' vars
+// word.func for 'simple' vars
 pub fn cmdAddr(vm: *VirtualStackMachine) !void {
     const addr = vm.current_word.dpos.?;
     try vm.dstk.push(addr);
 }
 
-// for vars with `does>`
+// word.func for vars with `does>`
 pub fn cmdAddrCall(vm: *VirtualStackMachine) !void {
     try cmdAddr(vm);
     try cmdCall(vm);

@@ -1,5 +1,6 @@
 
 const std = @import("std");
+const rt = @import("run-time.zig");
 const VirtualStackMachine = @import("machine.zig").VirtualStackMachine;
 const UNRESOLVED: usize = 0xFFFFFFFFFFFFFFFF;
 
@@ -67,6 +68,15 @@ pub fn compDoes(self: *VirtualStackMachine) !void {
     try self.appendText(wn, .word_number);
     wn = self.dict.getWordNumber("ret").?;
     try self.appendText(wn, .word_number);
+}
+
+pub fn execDoes(self: *VirtualStackMachine) !void {
+    // adding a word with that new defining word
+    var w = &self.dict.words[self.dict.nwords];
+    // last word (i.e. the one being added now)
+    w.func = rt.cmdAddrCall; // :)
+    w.cpos = self.cptr + 1;
+    // right after the 'does, ret'
 }
 
 pub fn compRet(vm: *VirtualStackMachine) !void {

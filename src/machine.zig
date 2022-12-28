@@ -358,15 +358,6 @@ pub const VirtualStackMachine = struct {
         _ = try self.dict.addWord(word);
     }
 
-    fn execDoes(self: *VirtualStackMachine) !void {
-        // adding a word with that new defining word
-        var w = &self.dict.words[self.dict.nwords];
-        // last word (i.e. the one being added now)
-        w.func = rt.cmdAddrCall; // :)
-        w.cpos = self.cptr + 1;
-        // right after the 'does, ret'
-    }
-
     pub fn init() !VirtualStackMachine {
 
         var vm = VirtualStackMachine {
@@ -425,7 +416,7 @@ pub const VirtualStackMachine = struct {
             // defining words (dictionary management)
             .{.name = "create", .func = &makeAddrWord},
             .{.name = "does>", .func = &ct.compDoes, .comp = true},
-            .{.name = "does", .func = &execDoes},
+            .{.name = "does", .func = &ct.execDoes},
             .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "val", .func = &},
 
