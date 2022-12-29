@@ -163,7 +163,8 @@ pub const VirtualStackMachine = struct {
                 try self.dstk.push(0);
                 return;
             }
-            if (' ' == byte[0]) break;
+            if (' ' == byte[0])
+                break;
         }
 
         if ('\n' == byte[0])
@@ -180,9 +181,10 @@ pub const VirtualStackMachine = struct {
         std.debug.print("discarded input: '", .{});
         while (true) {
             _ = os.linux.ioctl(0, os.linux.T.FIONREAD, @ptrToInt(&n));
-            if (0 == n) break;
+            if (0 == n)
+                break;
             _ = try os.read(self.fd, b[0..]);
-            if (b[0] != 0x0A)
+            if (b[0] != '\n')
                 _ = try os.write(1, b[0..]);
         }
         std.debug.print("'\n", .{});
@@ -481,7 +483,7 @@ pub const VirtualStackMachine = struct {
         self.fd = try os.open(file, os.O.RDONLY, 0);
         try self.run();
         os.close(self.fd);
-        self.fd = 0;
+        self.fd = 0; // switch to stdin
     }
 
     pub fn run(self: *VirtualStackMachine) !void {

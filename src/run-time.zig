@@ -137,28 +137,28 @@ pub fn cmdEql(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res: bool = (lhs == rhs);
-    try vm.dstk.push(@boolToInt(res));
+    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
 }
 
 pub fn cmdNeq(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res: bool = (lhs != rhs);
-    try vm.dstk.push(@boolToInt(res));
+    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
 }
 
 pub fn cmdGt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) > @bitCast(isize, rhs);
-    try vm.dstk.push(@boolToInt(res));
+    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
 }
 
 pub fn cmdLt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
     const res = @bitCast(isize, lhs) < @bitCast(isize, rhs);
-    try vm.dstk.push(@boolToInt(res));
+    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
 }
 
 // word.func for 'simple' vars
