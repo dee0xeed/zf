@@ -399,7 +399,6 @@ pub const VirtualStackMachine = struct {
             .{.name = "/",    .func = &rt.cmdDiv               },
             .{.name = "mod",  .func = &rt.cmdMod               },
             .{.name = "=",    .func = &rt.cmdEql               },
-            .{.name = "<>",   .func = &rt.cmdNeq               },
             .{.name = ">",    .func = &rt.cmdGt                },
             .{.name = "<",    .func = &rt.cmdLt                },
             .{.name = "!",    .func = &rt.cmdStore             },

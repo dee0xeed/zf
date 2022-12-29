@@ -140,13 +140,6 @@ pub fn cmdEql(vm: *VirtualStackMachine) !void {
     try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
 }
 
-pub fn cmdNeq(vm: *VirtualStackMachine) !void {
-    const rhs = try vm.dstk.pop();
-    const lhs = try vm.dstk.pop();
-    const res: bool = (lhs != rhs);
-    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
-}
-
 pub fn cmdGt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();

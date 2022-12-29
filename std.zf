@@ -2,6 +2,7 @@
 : 1- 1 - ;
 : 2* 2 * ;
 : 2/ 2 / ;
+: <> = inv ;
 : 0= 0 = ;
 : 0<> 0 <> ;
 : 0> 0 > ;
@@ -9,6 +10,7 @@
 : over >r dup r> swap ;
 : rot >r swap r> swap ;
 : 2dup over over ;
+: 2drop drop drop ;
 : ? @ . cr ;
 : r@ r> dup >r ;
 : +! dup @ rot + swap ! ;
@@ -21,12 +23,10 @@
 : array ( n -- )
     create dup , allot
     does>
-        over 1
-        < if
+        over 1 < if
             drop drop
         else
-            2dup @
-            > if
+            2dup @ > if
                 drop drop
             else
                 over + swap drop

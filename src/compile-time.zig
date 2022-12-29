@@ -76,7 +76,7 @@ pub fn execDoes(self: *VirtualStackMachine) !void {
     // last word (i.e. the one being added now)
     var w = &self.dict.words[self.dict.nwords];
     w.func = rt.cmdAddrCall; // :)
-    // right after the 'does, ret'
+    // right after the 'does, ret' compiled by compDoes()
     w.cpos = self.cptr + 1;
 }
 
