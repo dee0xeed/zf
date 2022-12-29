@@ -428,6 +428,8 @@ pub const VirtualStackMachine = struct {
             .{.name = "does", .func = &ct.execDoes},
             .{.name = ":",     .func = &enterCompileMode},
 //            .{.name = "val", .func = &},
+            //.{.name = "'", .func = &...}, read and just return word number...
+            //.{.name = "exec", .func = },
 
             // compiling words
             .{.name = ";",     .func = &ct.compRet, .comp = true},
@@ -514,6 +516,7 @@ pub const VirtualStackMachine = struct {
                 if (.interpreting == self.mode) {
                     self.dstk.top = 0;
                     self.rstk.top = 0;
+                    self.cptr = 0;
                     std.debug.print("{}\n", .{err});
                     self.need_prompt = true;
                 } else {
