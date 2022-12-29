@@ -147,6 +147,7 @@ cr x ?
 * [do-loop](https://stackoverflow.com/questions/6949434/how-to-implement-loop-in-a-forth-like-language-interpreter-written-in-c)
 * [do-leave-loop](https://stackoverflow.com/questions/58304029/how-is-forth-leave-loop-implemented-since-number-of-leaves-is-not-known-bef)
 * [create-does](//https://softwareengineering.stackexchange.com/questions/339283/forth-how-do-create-and-does-work-exactly)
+* [Multiple 'DOES>'](http://forum.6502.org/viewtopic.php?f=9&t=5118&view=next)
 
 ## ...
 

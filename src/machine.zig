@@ -375,6 +375,10 @@ pub const VirtualStackMachine = struct {
         const builtins: []const Word = &[_]Word {
 
             // "instruction set"
+            // NOTE: some "instructions" are not here
+            // cmdCall - word.func for 'usual' words
+            // cmdAddr - word.func for words-variables
+            // cmdAddrCall - word.func for words-variables with `does>`
             .{.name = "jump", .func = &rt.cmdJump, .hidd = true},
             .{.name = "jifz", .func = &rt.cmdJifz, .hidd = true},
             .{.name = "ret",  .func = &rt.cmdRet,  .hidd = true},
