@@ -12,7 +12,7 @@ pub const Word = struct {
     const MAX_WORD_LEN = 64;
     buff: [MAX_WORD_LEN]u8 = undefined,
     name: []const u8,
-    func: wordFnPtr,        // implementation
+    exec: wordFnPtr,        // implementation
     cpos: ?usize = null,    // location in the code segment, null for builtins
     hidd: bool = false,     // is hidden (not intended to be used directly)
     comp: bool = false,     // compile time only, "compiling word"
@@ -214,7 +214,7 @@ pub const VirtualStackMachine = struct {
         if (wnum) |wn| {
             const word = &self.dict.words[wn];
             if (true == word.comp) {
-                try word.func(self);
+                try word.exec(self);
             } else {
                 try self.appendText(wn, .word_number);
             }
@@ -245,7 +245,7 @@ pub const VirtualStackMachine = struct {
                 return Error.WordIsCompileOnly;
             }
             self.current_word = w;
-            try w.func(self);
+            try w.exec(self);
             return;
         }
 
@@ -340,7 +340,7 @@ pub const VirtualStackMachine = struct {
 
         const word = Word {
             .name = name,
-            .func = rt.cmdCall,
+            .exec = rt.cmdCall,
             .cpos = self.cend,
             .hidd = false,
             .comp = false,
@@ -355,13 +355,27 @@ pub const VirtualStackMachine = struct {
         const name = self.ibuf[0..self.bcnt];
         const word = Word {
             .name = name,
-            .func = rt.cmdAddr,
+            .exec = rt.cmdAddr,
             .cpos = self.cend,
             .hidd = false,
             .comp = false,
             .dpos = self.dend,
         };
         _ = try self.dict.addWord(word);
+    }
+
+    fn tick(self: *VirtualStackMachine) !void {
+        try self.readWord();
+        _ = try self.dstk.pop(); // check for zero
+        const name = self.ibuf[0..self.bcnt];
+        const wn = self.dict.getWordNumber(name)
+            orelse return Error.UndefinedWord;
+        try self.dstk.push(wn);
+    }
+
+    fn exec(self: *VirtualStackMachine) !void {
+        const wn = try self.dstk.pop();
+        try self.dict.words[wn].exec(self);
     }
 
     pub fn init() !VirtualStackMachine {
@@ -375,74 +389,73 @@ pub const VirtualStackMachine = struct {
         const builtins: []const Word = &[_]Word {
 
             // "instruction set"
-            // NOTE: some "instructions" are not here
-            // cmdCall - word.func for 'usual' words
-            // cmdAddr - word.func for words-variables
-            // cmdAddrCall - word.func for words-variables with `does>`
-            .{.name = "jump", .func = &rt.cmdJump, .hidd = true},
-            .{.name = "jifz", .func = &rt.cmdJifz, .hidd = true},
-            .{.name = "ret",  .func = &rt.cmdRet,  .hidd = true},
-            .{.name = "loop", .func = &rt.cmdLoop, .hidd = true},
-            .{.name = "lit",  .func = &rt.cmdLit,  .hidd = true},
-            .{.name = "dup",  .func = &rt.cmdDup               },
-            .{.name = "drop", .func = &rt.cmdDrop              },
-            .{.name = "swap", .func = &rt.cmdSwap              },
-            .{.name = ">r",   .func = &rt.cmdPush              },
-            .{.name = "r>",   .func = &rt.cmdPop               },
-            .{.name = "and",  .func = &rt.cmdAnd               },
-            .{.name = "or",   .func = &rt.cmdOr                },
-            .{.name = "xor",  .func = &rt.cmdXor               },
-            .{.name = "inv",  .func = &rt.cmdInv               },
-            .{.name = "+",    .func = &rt.cmdAdd               },
-            .{.name = "-",    .func = &rt.cmdSub               },
-            .{.name = "*",    .func = &rt.cmdMul               },
-            .{.name = "/",    .func = &rt.cmdDiv               },
-            .{.name = "mod",  .func = &rt.cmdMod               },
-            .{.name = "=",    .func = &rt.cmdEql               },
-            .{.name = ">",    .func = &rt.cmdGt                },
-            .{.name = "<",    .func = &rt.cmdLt                },
-            .{.name = "!",    .func = &rt.cmdStore             },
-            .{.name = "@",    .func = &rt.cmdFetch             },
+            .{.name = "jump", .exec = &rt.cmdJump, .hidd = true},
+            .{.name = "jifz", .exec = &rt.cmdJifz, .hidd = true},
+            .{.name = "ret",  .exec = &rt.cmdRet,  .hidd = true},
+            .{.name = "loop", .exec = &rt.cmdLoop, .hidd = true},
+            .{.name = "lit",  .exec = &rt.cmdLit,  .hidd = true},
+            .{.name = "dup",  .exec = &rt.cmdDup               },
+            .{.name = "drop", .exec = &rt.cmdDrop              },
+            .{.name = "swap", .exec = &rt.cmdSwap              },
+            .{.name = ">r",   .exec = &rt.cmdPush              },
+            .{.name = "r>",   .exec = &rt.cmdPop               },
+            .{.name = "and",  .exec = &rt.cmdAnd               },
+            .{.name = "or",   .exec = &rt.cmdOr                },
+            .{.name = "xor",  .exec = &rt.cmdXor               },
+            .{.name = "inv",  .exec = &rt.cmdInv               },
+            .{.name = "+",    .exec = &rt.cmdAdd               },
+            .{.name = "-",    .exec = &rt.cmdSub               },
+            .{.name = "*",    .exec = &rt.cmdMul               },
+            .{.name = "/",    .exec = &rt.cmdDiv               },
+            .{.name = "mod",  .exec = &rt.cmdMod               },
+            .{.name = "=",    .exec = &rt.cmdEql               },
+            .{.name = ">",    .exec = &rt.cmdGt                },
+            .{.name = "<",    .exec = &rt.cmdLt                },
+            .{.name = "!",    .exec = &rt.cmdStore             },
+            .{.name = "@",    .exec = &rt.cmdFetch             },
+            // NOTE: some "instructions" are not here:
+            // cmdCall - word.exec for 'usual' words
+            // cmdAddr - word.exec for words-variables
+            // cmdAddrCall - word.exec for words-variables with `does>`
 
             // shell
-            .{.name = "prom",  .func = &promImpl, .hidd = true},
-            .{.name = "read",  .func = &readWord, .hidd = true},
-            .{.name = "proc",  .func = &procWord, .hidd = true},
-            .{.name = "bye",   .func = &sayGoodbye},
-            .{.name = ".",     .func = &dotImpl},
-            .{.name = "cr",    .func = &crImpl},
-            .{.name = ".dict", .func = &dumpDict},
-            .{.name = ".dstk", .func = &dumpDataStack},
-            .{.name = ".rstk", .func = &dumpReturnStack},
-            .{.name = ".text", .func = &dumpCode},
-            .{.name = ".data", .func = &dumpData},
+            .{.name = "prom",  .exec = &promImpl, .hidd = true},
+            .{.name = "read",  .exec = &readWord, .hidd = true},
+            .{.name = "proc",  .exec = &procWord, .hidd = true},
+            .{.name = "bye",   .exec = &sayGoodbye},
+            .{.name = ".",     .exec = &dotImpl},
+            .{.name = "cr",    .exec = &crImpl},
+            .{.name = ".dict", .exec = &dumpDict},
+            .{.name = ".dstk", .exec = &dumpDataStack},
+            .{.name = ".rstk", .exec = &dumpReturnStack},
+            .{.name = ".text", .exec = &dumpCode},
+            .{.name = ".data", .exec = &dumpData},
 
             // memory management (data segment)
-            .{.name = "here",  .func = &mm.here},
-            .{.name = "allot", .func = &mm.allot},
-            // .{.name = ",", .func = &rt.Impl},
+            .{.name = "here",  .exec = &mm.here},
+            .{.name = "allot", .exec = &mm.allot},
 
             // defining words (dictionary management)
-            .{.name = "create", .func = &makeAddrWord},
-            .{.name = "does>", .func = &ct.compDoes, .comp = true},
-            .{.name = "does", .func = &ct.execDoes},
-            .{.name = ":",     .func = &enterCompileMode},
-//            .{.name = "val", .func = &},
-            //.{.name = "'", .func = &...}, read and just return word number...
-            //.{.name = "exec", .func = },
+            .{.name = "create", .exec = &makeAddrWord},
+            .{.name = "does>", .exec = &ct.compDoes, .comp = true},
+            .{.name = "does", .exec = &ct.execDoes},
+            .{.name = "'", .exec = &tick},
+            .{.name = "exec", .exec = &exec},
+            .{.name = ":",     .exec = &enterCompileMode},
+//            .{.name = "val", .exec = &},
 
             // compiling words
-            .{.name = ";",     .func = &ct.compRet, .comp = true},
-            .{.name = "if",    .func = &ct.compIf, .comp = true},
-            .{.name = "else",  .func = &ct.compElse, .comp = true},
-            .{.name = "then",  .func = &ct.compThen, .comp = true},
-            .{.name = "iter",  .func = &ct.compDo, .comp = true}, // do
-//            .{.name = "break", .func = &ct.breakImpl, .comp = true},
-            .{.name = "next",  .func = &ct.compLoop, .comp = true}, // loop
-            .{.name = "begin", .func = &ct.compBegin, .comp = true},
-            .{.name = "again", .func = &ct.compAgain, .comp = true},
-            .{.name = "until", .func = &ct.compUntil, .comp = true},
-            .{.name = "(",  .func = &ct.compComment, .comp = true},
+            .{.name = ";",     .exec = &ct.compRet, .comp = true},
+            .{.name = "if",    .exec = &ct.compIf, .comp = true},
+            .{.name = "else",  .exec = &ct.compElse, .comp = true},
+            .{.name = "then",  .exec = &ct.compThen, .comp = true},
+            .{.name = "iter",  .exec = &ct.compDo, .comp = true}, // do
+//            .{.name = "break", .exec = &ct.breakImpl, .comp = true},
+            .{.name = "next",  .exec = &ct.compLoop, .comp = true}, // loop
+            .{.name = "begin", .exec = &ct.compBegin, .comp = true},
+            .{.name = "again", .exec = &ct.compAgain, .comp = true},
+            .{.name = "until", .exec = &ct.compUntil, .comp = true},
+            .{.name = "(",  .exec = &ct.compComment, .comp = true},
         };
 
         for (builtins) |w|
@@ -511,7 +524,7 @@ pub const VirtualStackMachine = struct {
 
             self.current_word = &self.dict.words[wnum];
             self.cptr += 1;
-            self.current_word.func(self) catch |err| {
+            self.current_word.exec(self) catch |err| {
                 try self.drain();
                 if (.interpreting == self.mode) {
                     self.dstk.top = 0;
