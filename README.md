@@ -216,12 +216,10 @@ data[3] = 0x0000000000000001 ('i2')
 : array ( n -- )
     create dup , allot
     does>
-        over 1
-        < if
+        over 1 < if
             drop drop
         else
-            2dup @
-            > if
+            2dup @ > if
                 drop drop
             else
                 over + swap drop
@@ -292,7 +290,7 @@ zf> 5 ' . exec cr
 5 
 ```
 
-## ... postpone
+## ... `postpone`
 
 ```
 : endif postpone then ; immediate
