@@ -291,3 +291,27 @@ data[7] = 0x0000000000000009 ('-')
 zf> 5 ' . exec cr
 5 
 ```
+
+## ... postpone
+
+```
+zf> : not-zero? if-so-then 111 . cr else 222 . cr endif ;
+word  not-zero?  compiled @ 0x00a7
+zf> 
+zf> 5 not-zero?
+111 
+zf> 0 not-zero?
+222 
+zf> -5 not-zero?
+111 
+```
+
+```
+zf> : not-zero? if-so-then 111 . cr else 222 . cr endif ;
+zf> 5 not-zero?
+111 
+zf> 0 not-zero?
+222 
+zf> -5 not-zero?
+111 
+```
