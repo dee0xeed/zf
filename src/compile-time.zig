@@ -110,7 +110,7 @@ pub fn postpone(vm: *VirtualStackMachine) !void {
     try vm.readWord();
     _ = try vm.dstk.pop(); // check for zero
     const name = vm.ibuf[0..vm.bcnt];
-    std.debug.print("(postpone) w = '{s}'\n", .{name});
+//    std.debug.print("(postpone) w = '{s}'\n", .{name});
     const wn = vm.dict.getWordNumber(name) orelse
         return VirtualStackMachine.Error.UndefinedWord;
     const w = &vm.dict.words[wn];
