@@ -19,6 +19,8 @@
 : min dup rot dup rot < if swap drop else drop then ;
 : var create 1 allot ;
 : , here 1 allot ! ;
+\ test test test
+\ test test test
 : const create , does> @ ;
 : iter-impl r> rot rot swap >r >r >r ;
 : i r> r> dup >r swap >r ;

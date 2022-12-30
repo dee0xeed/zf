@@ -467,6 +467,7 @@ pub const VirtualStackMachine = struct {
             .{.name = "again", .exec = &ct.compAgain, .comp = true},
             .{.name = "until", .exec = &ct.compUntil, .comp = true},
             .{.name = "(",  .exec = &ct.compComment, .comp = true},
+            .{.name = "\\",  .exec = &ct.compBackSlashComment},
         };
 
         for (builtins) |w|

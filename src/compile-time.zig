@@ -97,6 +97,15 @@ pub fn compComment(vm: *VirtualStackMachine) !void {
     }
 }
 
+pub fn compBackSlashComment(vm: *VirtualStackMachine) !void {
+    while (true) {
+        var b: [1]u8 = undefined;
+        _ = try std.os.read(vm.fd, b[0..]);
+        if (0x0A == b[0])
+            break;
+    }
+}
+
 pub fn postpone(vm: *VirtualStackMachine) !void {
     try vm.readWord();
     _ = try vm.dstk.pop(); // check for zero
