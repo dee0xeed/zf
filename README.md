@@ -295,15 +295,8 @@ zf> 5 ' . exec cr
 ## ... postpone
 
 ```
-zf> : not-zero? if-so-then 111 . cr else 222 . cr endif ;
-word  not-zero?  compiled @ 0x00a7
-zf> 
-zf> 5 not-zero?
-111 
-zf> 0 not-zero?
-222 
-zf> -5 not-zero?
-111 
+: endif postpone then ; immediate
+: if-so-then postpone if ; immediate
 ```
 
 ```
