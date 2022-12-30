@@ -96,3 +96,20 @@ pub fn compComment(vm: *VirtualStackMachine) !void {
             break;
     }
 }
+
+pub fn postpone(vm: *VirtualStackMachine) !void {
+    try vm.readWord();
+    _ = try vm.dstk.pop(); // check for zero
+    const name = vm.ibuf[0..vm.bcnt];
+    std.debug.print("(postpone) w = '{s}'\n", .{name});
+    const wn = vm.dict.getWordNumber(name) orelse
+        return VirtualStackMachine.Error.UndefinedWord;
+    const w = &vm.dict.words[wn];
+    const this = &vm.dict.words[vm.dict.nwords];
+    if (true == w.comp) {
+        // this.comp = true; 
+        this.exec = w.exec;
+    } else {
+//        ??? what?..
+    }
+}

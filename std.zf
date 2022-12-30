@@ -22,6 +22,7 @@
 : const create , does> @ ;
 : iter-impl r> rot rot swap >r >r >r ;
 : i r> r> dup >r swap >r ;
+: endif postpone then ; immediate
 : array ( n -- )
     create dup , allot
     does>

@@ -79,7 +79,7 @@ pub const VirtualStackMachine = struct {
     const CODE_CAP = 32384;
     const DATA_CAP = 32384;
 
-    const Error = error {
+    pub const Error = error {
         WordNumberOutOfRange,
         CodeSpaceIsFull,
         ColonInsideWordDefinition,
@@ -140,7 +140,7 @@ pub const VirtualStackMachine = struct {
         }
     }
 
-    fn readWord(self: *VirtualStackMachine) !void {
+    pub fn readWord(self: *VirtualStackMachine) !void {
 
         var byte: [1]u8 = undefined;
         var cnt: usize = 0;
@@ -214,8 +214,10 @@ pub const VirtualStackMachine = struct {
         if (wnum) |wn| {
             const word = &self.dict.words[wn];
             if (true == word.comp) {
+                // specific compilation behavior
                 try word.exec(self);
             } else {
+                // default compilation behavior
                 try self.appendText(wn, .word_number);
             }
             return;
@@ -380,6 +382,11 @@ pub const VirtualStackMachine = struct {
         try self.dict.words[wn].exec(self);
     }
 
+    fn immediate(self: *VirtualStackMachine) !void {
+        var w = &self.dict.words[self.dict.nwords];
+        w.comp = true;
+    }
+
     pub fn init() !VirtualStackMachine {
 
         var vm = VirtualStackMachine {
@@ -443,11 +450,13 @@ pub const VirtualStackMachine = struct {
             .{.name = "does", .exec = &ct.execDoes},
             .{.name = "'", .exec = &tick},
             .{.name = "exec", .exec = &exec},
+            .{.name = "immediate", .exec = &immediate},
             .{.name = ":",     .exec = &enterCompileMode},
 //            .{.name = "val", .exec = &},
 
             // compiling words
             .{.name = ";",     .exec = &ct.compRet, .comp = true},
+            .{.name = "postpone", .exec = &ct.postpone, .comp = true},
             .{.name = "if",    .exec = &ct.compIf, .comp = true},
             .{.name = "else",  .exec = &ct.compElse, .comp = true},
             .{.name = "then",  .exec = &ct.compThen, .comp = true},
