@@ -473,25 +473,6 @@ pub const VirtualStackMachine = struct {
         try vm.appendText(0, .jump_location); // --> `prom`
         try vm.appendText(vm.dict.getWordNumber("bye").?, .word_number);
 
-//        vm.code[0] = vm.dict.getWordNumber("prom").?;
-//        vm.code[1] = vm.dict.getWordNumber("read").?;
-//        vm.code[2] = vm.dict.getWordNumber("jifz").?;
-//        vm.code[3] = 7;
-//        vm.code[4] = vm.dict.getWordNumber("proc").?;
-//        vm.code[5] = vm.dict.getWordNumber("jump").?;
-//        vm.code[6] = 0;
-//        vm.code[7] = vm.dict.getWordNumber("bye").?;
-//        vm.cend = 8;
-
-//        vm.meta[0] = .word_number;
-//        vm.meta[1] = .word_number;
-//        vm.meta[2] = .word_number;
-//        vm.meta[3] = .jump_location;
-//        vm.meta[4] = .word_number;
-//        vm.meta[5] = .word_number;
-//        vm.meta[6] = .jump_location;
-//        vm.meta[7] = .word_number;
-
         return vm;
     }
 
