@@ -476,16 +476,11 @@ pub const VirtualStackMachine = struct {
         return vm;
     }
 
-    fn reset(self: *VirtualStackMachine) !void {
-        try self.drain();
+    fn reset(self: *VirtualStackMachine) void {
         self.need_prompt = true;
         self.dstk.top = 0;
         self.rstk.top = 0;
-        self.cend = 8;
-        self.dend = 0;
         self.cptr = 0;
-        self.mode = .interpreting;
-        std.debug.print("machine reset\n", .{});
     }
 
     pub fn loadWords(self: *VirtualStackMachine, file: []const u8) !void {
@@ -498,11 +493,8 @@ pub const VirtualStackMachine = struct {
 
     pub fn run(self: *VirtualStackMachine) !void {
 
-        self.need_prompt = true;
+        self.reset();
         self.stop = false;
-        self.cptr = 0;
-        self.dstk.top = 0;
-        self.rstk.top = 0;
         self.mode = .interpreting;
 
         while (false == self.stop) {
@@ -519,11 +511,8 @@ pub const VirtualStackMachine = struct {
             self.current_word.exec(self) catch |err| {
                 try self.drain();
                 if (.interpreting == self.mode) {
-                    self.dstk.top = 0;
-                    self.rstk.top = 0;
-                    self.cptr = 0;
                     std.debug.print("{}\n", .{err});
-                    self.need_prompt = true;
+                    self.reset();
                 } else {
                     return err;
                 }
