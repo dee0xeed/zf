@@ -17,6 +17,7 @@ pub fn cmdJifz(vm: *VirtualStackMachine) !void {
 
 pub fn cmdCall(vm: *VirtualStackMachine) !void {
     try vm.rstk.push(vm.cptr);
+    // std.debug.print("cw = {s}\n", .{vm.current_word.name});
     vm.cptr = vm.current_word.cpos.?;
 }
 

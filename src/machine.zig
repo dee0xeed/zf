@@ -364,6 +364,7 @@ pub const VirtualStackMachine = struct {
         _ = try self.dict.addWord(word);
     }
 
+    // "execution token" is just the number of a word
     fn tick(self: *VirtualStackMachine) !void {
         try self.readWord();
         _ = try self.dstk.pop(); // check for zero
@@ -375,6 +376,7 @@ pub const VirtualStackMachine = struct {
 
     fn exec(self: *VirtualStackMachine) !void {
         const wn = try self.dstk.pop();
+        self.current_word = &self.dict.words[wn]; // :(
         try self.dict.words[wn].exec(self);
     }
 
