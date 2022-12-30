@@ -463,25 +463,34 @@ pub const VirtualStackMachine = struct {
         for (builtins) |w|
             _ = try vm.dict.addWord(w);
 
-        // construct (i.e. "compile") processing loop by hand
-        vm.code[0] = vm.dict.getWordNumber("prom").?;
-        vm.code[1] = vm.dict.getWordNumber("read").?;
-        vm.code[2] = vm.dict.getWordNumber("jifz").?;
-        vm.code[3] = 7;
-        vm.code[4] = vm.dict.getWordNumber("proc").?;
-        vm.code[5] = vm.dict.getWordNumber("jump").?;
-        vm.code[6] = 0;
-        vm.code[7] = vm.dict.getWordNumber("bye").?;
-        vm.cend = 8;
+        // compile processing loop
+        try vm.appendText(vm.dict.getWordNumber("prom").?, .word_number);
+        try vm.appendText(vm.dict.getWordNumber("read").?, .word_number);
+        try vm.appendText(vm.dict.getWordNumber("jifz").?, .word_number);
+        try vm.appendText(7, .jump_location); // --> `bye`
+        try vm.appendText(vm.dict.getWordNumber("proc").?, .word_number);
+        try vm.appendText(vm.dict.getWordNumber("jump").?, .word_number);
+        try vm.appendText(0, .jump_location); // --> `prom`
+        try vm.appendText(vm.dict.getWordNumber("bye").?, .word_number);
 
-        vm.meta[0] = .word_number;
-        vm.meta[1] = .word_number;
-        vm.meta[2] = .word_number;
-        vm.meta[3] = .jump_location;
-        vm.meta[4] = .word_number;
-        vm.meta[5] = .word_number;
-        vm.meta[6] = .jump_location;
-        vm.meta[7] = .word_number;
+//        vm.code[0] = vm.dict.getWordNumber("prom").?;
+//        vm.code[1] = vm.dict.getWordNumber("read").?;
+//        vm.code[2] = vm.dict.getWordNumber("jifz").?;
+//        vm.code[3] = 7;
+//        vm.code[4] = vm.dict.getWordNumber("proc").?;
+//        vm.code[5] = vm.dict.getWordNumber("jump").?;
+//        vm.code[6] = 0;
+//        vm.code[7] = vm.dict.getWordNumber("bye").?;
+//        vm.cend = 8;
+
+//        vm.meta[0] = .word_number;
+//        vm.meta[1] = .word_number;
+//        vm.meta[2] = .word_number;
+//        vm.meta[3] = .jump_location;
+//        vm.meta[4] = .word_number;
+//        vm.meta[5] = .word_number;
+//        vm.meta[6] = .jump_location;
+//        vm.meta[7] = .word_number;
 
         return vm;
     }
