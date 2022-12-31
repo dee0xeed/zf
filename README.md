@@ -306,3 +306,29 @@ zf> 0 not-zero?
 zf> -5 not-zero?
 111 
 ```
+
+## ... isn't `... then ... else ... if` more "forth-logical"? :)
+
+```
+: if postpone _if ; immediate
+: then postpone _then ; immediate
+: THEN postpone _if ; immediate
+: ELSE postpone else ; immediate
+: IF postpone _then ; immediate
+```
+
+```
+zf> : odd(v1)? 1 and if 1 . cr else 0 . cr then ;
+word  odd(v1)?   compiled @ 0x00ac
+zf> : odd(v2)? 1 and THEN 1 . cr ELSE 0 . cr IF ;
+word  odd(v2)?   compiled @ 0x00bc
+zf> 
+zf> 3 odd(v1)?
+1 
+zf> 4 odd(v1)?
+0 
+zf> 3 odd(v2)?
+1 
+zf> 4 odd(v2)?
+0 
+```

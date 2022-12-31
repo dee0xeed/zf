@@ -457,9 +457,9 @@ pub const VirtualStackMachine = struct {
             // compiling words
             .{.name = ";",     .exec = &ct.compRet, .comp = true},
             .{.name = "postpone", .exec = &ct.postpone, .comp = true},
-            .{.name = "if",    .exec = &ct.compIf, .comp = true},
+            .{.name = "_if",    .exec = &ct.compIf, .comp = true},
             .{.name = "else",  .exec = &ct.compElse, .comp = true},
-            .{.name = "then",  .exec = &ct.compThen, .comp = true},
+            .{.name = "_then",  .exec = &ct.compThen, .comp = true},
             .{.name = "iter",  .exec = &ct.compDo, .comp = true}, // do
 //            .{.name = "break", .exec = &ct.breakImpl, .comp = true},
             .{.name = "next",  .exec = &ct.compLoop, .comp = true}, // loop

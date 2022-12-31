@@ -15,8 +15,8 @@
 : ? @ . cr ;
 : r@ r> dup >r ;
 : +! dup @ rot + swap ! ;
-: max dup rot dup rot > if swap drop else drop then ;
-: min dup rot dup rot < if swap drop else drop then ;
+: max dup rot dup rot > _if swap drop else drop _then ;
+: min dup rot dup rot < _if swap drop else drop _then ;
 : var create 1 allot ;
 : , here 1 allot ! ;
 \ test test test
@@ -24,18 +24,23 @@
 : const create , does> @ ;
 : iter-impl r> rot rot swap >r >r >r ;
 : i r> r> dup >r swap >r ;
-: endif postpone then ; immediate
-: if-so-then postpone if ; immediate
+: THEN postpone _if ; immediate
+: ELSE postpone else ; immediate
+: IF postpone _then ; immediate
+: if postpone _if ; immediate
+: if-so-then postpone _if ; immediate
+: endif postpone _then ; immediate
+: then postpone _then ; immediate
 : array ( n -- )
     create dup , allot
     does>
-        over 1 < if
+        over 1 < _if
             drop drop
         else
-            2dup @ > if
+            2dup @ > _if
                 drop drop
             else
                 over + swap drop
-            then
-        then
+            _then
+        _then
 ;
