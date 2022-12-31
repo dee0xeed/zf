@@ -319,10 +319,7 @@ zf> -5 not-zero?
 
 ```
 zf> : odd(v1)? 1 and if 1 . cr else 0 . cr then ;
-word  odd(v1)?   compiled @ 0x00ac
 zf> : odd(v2)? 1 and THEN 1 . cr ELSE 0 . cr IF ;
-word  odd(v2)?   compiled @ 0x00bc
-zf> 
 zf> 3 odd(v1)?
 1 
 zf> 4 odd(v1)?
