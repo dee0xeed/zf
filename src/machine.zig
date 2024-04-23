@@ -35,7 +35,8 @@ pub const Dict = struct {
             return Error.DictionaryIsFull;
 
         self.words[self.nwords] = word;
-        for (word.name) |b, k| {
+        for (word.name, 0..) |b, k| {
+        //for (word.name) |b| {
             self.words[self.nwords].buff[k] = b;
         }
         self.words[self.nwords].name = self.words[self.nwords].buff[0..word.name.len];
@@ -119,22 +120,22 @@ pub const VirtualStackMachine = struct {
 
     fn dotImpl(vm: *VirtualStackMachine) !void {
         const n = try vm.dstk.pop();
-        const i = @bitCast(isize, n);
+        const i:isize = @bitCast(n);
         std.debug.print("{} ", .{i});
     }
 
     fn crImpl(self: *VirtualStackMachine) !void {
         _ = self;
-        _ = try os.write(1, "\n");
+        _ = try std.posix.write(1, "\n");
     }
 
     fn promImpl(self: *VirtualStackMachine) !void {
         if (self.need_prompt) {
             if (.compiling == self.mode) {
                 if (0 == self.fd)
-                    _ = try os.write(1, "zf(c)> ");
+                    _ = try std.posix.write(1, "zf(c)> ");
             } else {
-                _ = try os.write(1, "zf> ");
+                _ = try std.posix.write(1, "zf> ");
             }
             self.need_prompt = false;
         }
@@ -148,7 +149,7 @@ pub const VirtualStackMachine = struct {
 
         byte[0] = ' ';
         while (' ' == byte[0]) {
-            res = try os.read(self.fd, byte[0..]);
+            res = try std.posix.read(self.fd, byte[0..]);
             if (0 == res) {
                 try self.dstk.push(0);
                 return;
@@ -158,7 +159,7 @@ pub const VirtualStackMachine = struct {
         while ('\n' != byte[0]) {
             self.ibuf[cnt] = byte[0];
             cnt += 1;
-            res = try os.read(self.fd, byte[0..]);
+            res = try std.posix.read(self.fd, byte[0..]);
             if (0 == res) {
                 try self.dstk.push(0);
                 return;
@@ -180,12 +181,12 @@ pub const VirtualStackMachine = struct {
         var b: [1]u8 = undefined;
         std.debug.print("discarded input: '", .{});
         while (true) {
-            _ = os.linux.ioctl(0, os.linux.T.FIONREAD, @ptrToInt(&n));
+            _ = os.linux.ioctl(0, os.linux.T.FIONREAD, @intFromPtr(&n));
             if (0 == n)
                 break;
-            _ = try os.read(self.fd, b[0..]);
+            _ = try std.posix.read(self.fd, b[0..]);
             if (b[0] != '\n')
-                _ = try os.write(1, b[0..]);
+                _ = try std.posix.write(1, b[0..]);
         }
         std.debug.print("'\n", .{});
     }
@@ -232,7 +233,7 @@ pub const VirtualStackMachine = struct {
         // compile number literal
         const wn = self.dict.getWordNumber("lit").?;
         try self.appendText(wn, .word_number);
-        try self.appendText(@bitCast(usize, number), .numb_literal);
+        try self.appendText(@bitCast(number), .numb_literal);
     }
 
     fn execute(self: *VirtualStackMachine, name: []const u8) !void {
@@ -240,7 +241,7 @@ pub const VirtualStackMachine = struct {
         // string? TODO...
         //const name = self.ibuf[0..self.bcnt];
 
-        var word = self.dict.findWord(name);
+        const word = self.dict.findWord(name);
         if (word) |w| {
             if (true == w.comp) {
                 std.debug.print("word '{s}' is compile-only\n", .{name});
@@ -257,7 +258,7 @@ pub const VirtualStackMachine = struct {
             return Error.UndefinedWord;
         };
 
-        try self.dstk.push(@bitCast(usize, number));
+        try self.dstk.push(@bitCast(number));
 
     }
 
@@ -281,7 +282,7 @@ pub const VirtualStackMachine = struct {
     }
 
     fn dumpDict(self: *VirtualStackMachine) !void {
-        for (self.dict.words) |w, k| {
+        for (self.dict.words, 0..) |w, k| {
             if ((false == w.hidd) and (w.name.len > 0))
                 std.debug.print("{s} ", .{w.name});
             if (k == self.dict.nwords) break;
@@ -495,9 +496,9 @@ pub const VirtualStackMachine = struct {
 
     pub fn loadWords(self: *VirtualStackMachine, file: []const u8) !void {
         std.debug.print("loading words from {s}...\n", .{file});
-        self.fd = try os.open(file, os.O.RDONLY, 0);
+        self.fd = try std.posix.open(file, .{.ACCMODE = .RDONLY}, 0);
         try self.run();
-        os.close(self.fd);
+        std.posix.close(self.fd);
         self.fd = 0; // switch to stdin
     }
 
@@ -509,7 +510,7 @@ pub const VirtualStackMachine = struct {
 
         while (false == self.stop) {
 
-            var wnum = self.code[self.cptr];
+            const wnum = self.code[self.cptr];
 
             if ((0 == wnum) or (wnum > self.dict.nwords)) {
                 std.debug.print("wnum = 0x{x:0>16}\n", .{wnum});

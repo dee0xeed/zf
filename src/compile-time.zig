@@ -91,7 +91,7 @@ pub fn compRet(vm: *VirtualStackMachine) !void {
 pub fn compComment(vm: *VirtualStackMachine) !void {
     while (true) {
         var b: [1]u8 = undefined;
-        _ = try std.os.read(vm.fd, b[0..]);
+        _ = try std.posix.read(vm.fd, b[0..]);
         if (std.mem.eql(u8, b[0..], ")"))
             break;
     }
@@ -100,7 +100,7 @@ pub fn compComment(vm: *VirtualStackMachine) !void {
 pub fn compBackSlashComment(vm: *VirtualStackMachine) !void {
     while (true) {
         var b: [1]u8 = undefined;
-        _ = try std.os.read(vm.fd, b[0..]);
+        _ = try std.posix.read(vm.fd, b[0..]);
         if (0x0A == b[0])
             break;
     }

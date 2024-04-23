@@ -100,59 +100,59 @@ pub fn cmdInv(vm: *VirtualStackMachine) !void {
 }
 
 pub fn cmdAdd(vm: *VirtualStackMachine) !void {
-    const rhs = try vm.dstk.pop();
-    const lhs = try vm.dstk.pop();
-    const res = @bitCast(isize, lhs) + @bitCast(isize, rhs);
-    try vm.dstk.push(@bitCast(usize, res));
+    const rhs: isize = @bitCast(try vm.dstk.pop());
+    const lhs: isize = @bitCast(try vm.dstk.pop());
+    const res = lhs + rhs;
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdSub(vm: *VirtualStackMachine) !void {
-    const rhs = try vm.dstk.pop();
-    const lhs = try vm.dstk.pop();
-    const res = @bitCast(isize, lhs) - @bitCast(isize, rhs);
-    try vm.dstk.push(@bitCast(usize, res));
+    const rhs: isize = @bitCast(try vm.dstk.pop());
+    const lhs: isize = @bitCast(try vm.dstk.pop());
+    const res = lhs - rhs;
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdMul(vm: *VirtualStackMachine) !void {
-    const rhs = try vm.dstk.pop();
-    const lhs = try vm.dstk.pop();
-    const res = @bitCast(isize, lhs) * @bitCast(isize, rhs);
-    try vm.dstk.push(@bitCast(usize, res));
+    const rhs: isize = @bitCast(try vm.dstk.pop());
+    const lhs: isize = @bitCast(try vm.dstk.pop());
+    const res = lhs * rhs;
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdDiv(vm: *VirtualStackMachine) !void {
-    const rhs = try vm.dstk.pop();
-    const lhs = try vm.dstk.pop();
-    const res = @divTrunc(@bitCast(isize, lhs), @bitCast(isize, rhs));
-    try vm.dstk.push(@bitCast(usize, res));
+    const rhs: isize = @bitCast(try vm.dstk.pop());
+    const lhs: isize = @bitCast(try vm.dstk.pop());
+    const res = @divTrunc(lhs, rhs);
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdMod(vm: *VirtualStackMachine) !void {
-    const rhs = try vm.dstk.pop();
-    const lhs = try vm.dstk.pop();
-    const res = @mod(@bitCast(isize, lhs), @bitCast(isize, rhs));
-    try vm.dstk.push(@bitCast(usize, res));
+    const rhs: isize = @bitCast(try vm.dstk.pop());
+    const lhs: isize = @bitCast(try vm.dstk.pop());
+    const res = @mod(lhs, rhs);
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdEql(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
-    const res: bool = (lhs == rhs);
-    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
+    const res: isize = -@as(isize, @intCast(@intFromBool(lhs == rhs)));
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdGt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
-    const res = @bitCast(isize, lhs) > @bitCast(isize, rhs);
-    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
+    const res: isize = -@as(isize, @intCast(@intFromBool(lhs > rhs)));
+    try vm.dstk.push(@bitCast(res));
 }
 
 pub fn cmdLt(vm: *VirtualStackMachine) !void {
     const rhs = try vm.dstk.pop();
     const lhs = try vm.dstk.pop();
-    const res = @bitCast(isize, lhs) < @bitCast(isize, rhs);
-    try vm.dstk.push(@bitCast(usize, -@intCast(isize, @boolToInt(res))));
+    const res: isize = -@as(isize, @intCast(@intFromBool(lhs < rhs)));
+    try vm.dstk.push(@bitCast(res));
 }
 
 // word.exec for 'simple' vars
