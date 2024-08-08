@@ -1,0 +1,66 @@
+
+jump, call, ret, jz, jcz
+load, store, loadp, storep, lit
+com, xor, and, add, shl, shr, addnz
+loada, storea, dup, drop, over, nop
+
+---
+
+branching instructions take a 10 bit inlined on page argument
+
+jump = replace lower 10 bits of PC with inlined argument
+call = push PC to return stack, and jump
+jz = jump if top of stack=0 (not including carry) (T0)
+jcz = jump if carry bit not set (C0)
+ret = return, move top of return stack to PC
+
+loada = move top of stack to A register (A)
+storea = copy A register to top of stack (!A)
+load = move contents of memory address by A to top of stack (@)
+store = move constents of top of stack to memory addressed by A (!)
+loadp = move contents of memory address by A to T, increment A (@+)
+storep = move constents of Tto memory addressed by A, increment A (!+)
+lit = copy contents of following cell to T, move PC past literal (#)
+
+logic
+and = logical and T and S to make a new T, remove S
+xor = logical xor T and S to make a new T, remove S
+com = invert all bits in T (including carry)
+
+math
+add = add T and S, put result in T and remove S (+)
+shl = shift T left 1 bit including the carry bit (2*)
+shr = shift 20 bits of T right, T.20 and T.19 unchanged (2/)
+addnz = conditionaly add T to S place result in T but (+n)
+not drop S if and only if T.0 is true
+
+stack operations (on stack operations the bottom 4 stack cells wrap)
+dup = duplicate T on stack
+drop = remove T from stack
+over = place copy of S above T and S on stack
+
+(you left out)
+push = move top of data stack to top of return stack (>R)
+pop = move top of return stack to top of data stack (R>)
+
+no operation instruction
+nop = delay 10ns
+
+If you have any questions you can download the S21
+simulator and single step through instructions while
+watching the contents of all the registers. You can
+also read the online documentation for the assembler
+in P21Forth. There is even a copy of P21Forth that
+runs on the simulator so you can run ANS Forth programs
+in the simulator. (if you are very patient, it is
+thousands of times slower than a real chip)
+
+The instructions were given one set of names by Chuck
+and two sets of names by Dr. Ting. This set of names
+was supposed to be obvious to people familar with
+conventional assembler. I prefer the set that look
+like Forth. Chuck used a set of shorter names in
+his assemler in OKAD because of the screen layout. He
+has gone back to more Forth like names in Color Forth.
+--
+Jeff Fox UltraTechnology
