@@ -1,5 +1,6 @@
 # zf
 An implementation of FORTH-like virtual stack machine in Zig
+
 (`/opt/zig-0.14/zig build -Doptimize=ReleaseFast` to build)
 
 ## words
